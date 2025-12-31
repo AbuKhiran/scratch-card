@@ -17,7 +17,7 @@ body{
   color:white;
 }
 
-/* شاشة كلمة السر فقط */
+/* شاشة كلمة السر */
 #lockScreen{
   text-align:center;
 }
@@ -47,11 +47,10 @@ button{
 }
 
 /* المحتوى بعد الفتح */
-.container{
+#content{
   display:none;
-  position:relative;
   width:90%;
-  max-width:900px;
+  max-width:800px;
   padding:40px;
   background:rgba(0,0,0,.3);
   border-radius:25px;
@@ -65,16 +64,9 @@ h1{
   margin-bottom:20px;
 }
 
-#paragraph{
+#message{
   font-size:1.6em;
-  margin:30px 0;
-}
-
-canvas{
-  position:absolute;
-  inset:0;
-  border-radius:25px;
-  touch-action:none;
+  line-height:2em;
 }
 
 #date{
@@ -87,7 +79,7 @@ canvas{
 
 <body>
 
-<!-- 🔐 شاشة كلمة السر -->
+<!-- 🔐 كلمة السر فقط -->
 <div id="lockScreen">
   <input type="password" id="pass" placeholder="Enter password">
   <button onclick="unlock()">Unlock</button>
@@ -95,10 +87,9 @@ canvas{
 </div>
 
 <!-- 🎁 المحتوى -->
-<div class="container" id="content">
+<div id="content">
   <h1 id="name"></h1>
-  <p id="paragraph"></p>
-  <canvas id="scratch"></canvas>
+  <p id="message"></p>
   <div id="date"></div>
 </div>
 
@@ -113,8 +104,9 @@ let todayPassword = "";
 
 // ======================
 // DATE
+const todayISO = new Date().toISOString().slice(0,10);
 document.getElementById("date").innerText =
-  "📅 " + new Date().toLocaleDateString("en-GB");
+  "📅 " + todayISO;
 
 // ======================
 // FETCH GOOGLE SHEET
@@ -124,17 +116,24 @@ fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`)
   const json = JSON.parse(t.substring(47).slice(0, -2));
   const rows = json.table.rows.slice(1); // تجاهل العناوين
 
-  const today = new Date();
-  const index = today.getDate() % rows.length;
+  const todayRow = rows.find(r =>
+    r.c[0]?.v === todayISO
+  );
+
+  if(!todayRow){
+    document.getElementById("error").innerText =
+      "❌ No data for today";
+    return;
+  }
 
   document.getElementById("name").innerText =
-    rows[index].c[0]?.v || "";
+    todayRow.c[1]?.v || "";
 
-  document.getElementById("paragraph").innerText =
-    rows[index].c[1]?.v || "";
+  document.getElementById("message").innerText =
+    todayRow.c[2]?.v || "";
 
-  todayPassword = rows[index].c[2]?.v
-    ? String(rows[index].c[2].v).trim().toLowerCase()
+  todayPassword = todayRow.c[3]?.v
+    ? String(todayRow.c[3].v).trim().toLowerCase()
     : "";
 });
 
@@ -148,51 +147,11 @@ function unlock(){
   if(input === todayPassword && input !== ""){
     document.getElementById("lockScreen").style.display="none";
     document.getElementById("content").style.display="block";
-    initScratch();
   } else {
-    document.getElementById("error").innerText = "❌ Wrong password";
+    document.getElementById("error").innerText =
+      "❌ Wrong password";
   }
 }
-
-// ======================
-// SCRATCH CARD
-const canvas = document.getElementById("scratch");
-const ctx = canvas.getContext("2d");
-
-function initScratch(){
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
-  ctx.fillStyle = "#666";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-}
-
-let drawing = false;
-
-function getPos(e){
-  const r = canvas.getBoundingClientRect();
-  const t = e.touches ? e.touches[0] : e;
-  return { x: t.clientX - r.left, y: t.clientY - r.top };
-}
-
-function scratch(e){
-  if(!drawing) return;
-  const p = getPos(e);
-  ctx.globalCompositeOperation = "destination-out";
-  ctx.beginPath();
-  ctx.arc(p.x, p.y, 30, 0, Math.PI * 2);
-  ctx.fill();
-}
-
-// Mouse
-canvas.onmousedown = () => drawing = true;
-canvas.onmouseup = () => drawing = false;
-canvas.onmouseleave = () => drawing = false;
-canvas.onmousemove = scratch;
-
-// Touch
-canvas.ontouchstart = e => { drawing = true; scratch(e); e.preventDefault(); };
-canvas.ontouchend = () => drawing = false;
-canvas.ontouchmove = e => { scratch(e); e.preventDefault(); };
 </script>
 
 </body>
