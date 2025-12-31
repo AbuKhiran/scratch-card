@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nour Scratch 💖</title>
+<title>Daily Secret 💖</title>
 
 <style>
 body{
@@ -17,7 +17,38 @@ body{
   color:white;
 }
 
+/* شاشة كلمة السر فقط */
+#lockScreen{
+  text-align:center;
+}
+
+input{
+  padding:15px;
+  font-size:1.2em;
+  border-radius:12px;
+  border:none;
+  outline:none;
+}
+
+button{
+  padding:12px 30px;
+  margin-left:10px;
+  font-size:1.1em;
+  border:none;
+  border-radius:12px;
+  background:#ff79c6;
+  color:white;
+  cursor:pointer;
+}
+
+#error{
+  margin-top:15px;
+  color:#ffaaaa;
+}
+
+/* المحتوى بعد الفتح */
 .container{
+  display:none;
   position:relative;
   width:90%;
   max-width:900px;
@@ -31,10 +62,7 @@ body{
 h1{
   font-size:4em;
   color:#ff79c6;
-}
-
-#content{
-  display:none; /* 🔒 مخفي بالكامل */
+  margin-bottom:20px;
 }
 
 #paragraph{
@@ -47,165 +75,124 @@ canvas{
   inset:0;
   border-radius:25px;
   touch-action:none;
-  display:none; /* 🔒 */
-}
-
-#lock{
-  margin-top:30px;
-}
-
-input{
-  padding:10px;
-  font-size:1em;
-  border-radius:10px;
-  border:none;
-  outline:none;
-}
-
-button{
-  padding:10px 20px;
-  border:none;
-  border-radius:10px;
-  background:#ff79c6;
-  color:white;
-  cursor:pointer;
-}
-
-#error{
-  color:#ffaaaa;
-  margin-top:10px;
 }
 
 #date{
   margin-top:30px;
-  font-size:0.9em;
+  font-size:.9em;
   opacity:.8;
-  display:none; /* 🔒 */
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-  <h1>NOUR</h1>
+<!-- 🔐 شاشة كلمة السر -->
+<div id="lockScreen">
+  <input type="password" id="pass" placeholder="Enter password">
+  <button onclick="unlock()">Unlock</button>
+  <div id="error"></div>
+</div>
 
-  <!-- 🔐 شاشة القفل -->
-  <div id="lock">
-    <input type="password" id="pass" placeholder="Enter password">
-    <button onclick="unlock()">Unlock</button>
-    <div id="error"></div>
-  </div>
-
-  <!-- 🔒 المحتوى المخفي -->
-  <div id="content">
-    <p id="paragraph"></p>
-  </div>
-
+<!-- 🎁 المحتوى -->
+<div class="container" id="content">
+  <h1 id="name"></h1>
+  <p id="paragraph"></p>
   <canvas id="scratch"></canvas>
-
   <div id="date"></div>
 </div>
 
 <script>
-// =====================
+// ======================
 // CONFIG
-// =====================
+// ======================
 const SHEET_ID = "1Lunrna_CRR3EUdiGW0csT0LNa97P7GEneZM_-NRTo8g";
 
-// =====================
+// ======================
 let todayPassword = "";
-let unlocked = false;
 
-// =====================
-// DATE (مخفي)
+// ======================
+// DATE
 document.getElementById("date").innerText =
   "📅 " + new Date().toLocaleDateString("en-GB");
 
-// =====================
-// FETCH SHEET
+// ======================
+// FETCH GOOGLE SHEET
 fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`)
-.then(r=>r.text())
-.then(t=>{
-  const json = JSON.parse(t.substring(47).slice(0,-2));
-  const rows = json.table.rows;
+.then(r => r.text())
+.then(t => {
+  const json = JSON.parse(t.substring(47).slice(0, -2));
+  const rows = json.table.rows.slice(1); // تجاهل العناوين
 
-  const start = new Date("2025-01-01");
   const today = new Date();
-  const index =
-    Math.floor((today-start)/(1000*60*60*24)) % rows.length;
+  const index = today.getDate() % rows.length;
 
-  document.getElementById("paragraph").innerText =
+  document.getElementById("name").innerText =
     rows[index].c[0]?.v || "";
 
-  todayPassword = rows[index].c[1]?.v
-    ? rows[index].c[1].v.toString().trim()
+  document.getElementById("paragraph").innerText =
+    rows[index].c[1]?.v || "";
+
+  todayPassword = rows[index].c[2]?.v
+    ? String(rows[index].c[2].v).trim().toLowerCase()
     : "";
 });
 
-// =====================
+// ======================
 // UNLOCK
 function unlock(){
-  const input = document.getElementById("pass").value.trim();
+  const input = document.getElementById("pass").value
+    .trim()
+    .toLowerCase();
 
   if(input === todayPassword && input !== ""){
-    unlocked = true;
-
-    // إخفاء القفل
-    document.getElementById("lock").style.display="none";
-
-    // إظهار المحتوى
+    document.getElementById("lockScreen").style.display="none";
     document.getElementById("content").style.display="block";
-    document.getElementById("date").style.display="block";
-    canvas.style.display="block";
-
     initScratch();
-  }else{
-    document.getElementById("error").innerText="❌ Wrong password";
+  } else {
+    document.getElementById("error").innerText = "❌ Wrong password";
   }
 }
 
-// =====================
-// SCRATCH
+// ======================
+// SCRATCH CARD
 const canvas = document.getElementById("scratch");
 const ctx = canvas.getContext("2d");
 
 function initScratch(){
   canvas.width = canvas.offsetWidth;
   canvas.height = canvas.offsetHeight;
-
-  ctx.globalCompositeOperation="source-over";
-  ctx.fillStyle="#666";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = "#666";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-let drawing=false;
+let drawing = false;
 
 function getPos(e){
-  const r=canvas.getBoundingClientRect();
-  const t=e.touches?e.touches[0]:e;
-  return {x:t.clientX-r.left,y:t.clientY-r.top};
+  const r = canvas.getBoundingClientRect();
+  const t = e.touches ? e.touches[0] : e;
+  return { x: t.clientX - r.left, y: t.clientY - r.top };
 }
 
 function scratch(e){
-  if(!drawing || !unlocked) return;
-  const p=getPos(e);
-  ctx.globalCompositeOperation="destination-out";
+  if(!drawing) return;
+  const p = getPos(e);
+  ctx.globalCompositeOperation = "destination-out";
   ctx.beginPath();
-  ctx.arc(p.x,p.y,30,0,Math.PI*2);
+  ctx.arc(p.x, p.y, 30, 0, Math.PI * 2);
   ctx.fill();
 }
 
 // Mouse
-canvas.onmousedown=()=>drawing=true;
-canvas.onmouseup=()=>drawing=false;
-canvas.onmouseleave=()=>drawing=false;
-canvas.onmousemove=scratch;
+canvas.onmousedown = () => drawing = true;
+canvas.onmouseup = () => drawing = false;
+canvas.onmouseleave = () => drawing = false;
+canvas.onmousemove = scratch;
 
 // Touch
-canvas.ontouchstart=e=>{drawing=true;scratch(e);e.preventDefault();}
-canvas.ontouchend=()=>drawing=false;
-canvas.ontouchmove=e=>{scratch(e);e.preventDefault();}
+canvas.ontouchstart = e => { drawing = true; scratch(e); e.preventDefault(); };
+canvas.ontouchend = () => drawing = false;
+canvas.ontouchmove = e => { scratch(e); e.preventDefault(); };
 </script>
 
 </body>
