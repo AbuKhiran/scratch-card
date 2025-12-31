@@ -31,7 +31,10 @@ body{
 h1{
   font-size:4em;
   color:#ff79c6;
-  margin-bottom:20px;
+}
+
+#content{
+  display:none; /* 🔒 مخفي بالكامل */
 }
 
 #paragraph{
@@ -44,10 +47,11 @@ canvas{
   inset:0;
   border-radius:25px;
   touch-action:none;
+  display:none; /* 🔒 */
 }
 
 #lock{
-  margin-top:20px;
+  margin-top:30px;
 }
 
 input{
@@ -76,6 +80,7 @@ button{
   margin-top:30px;
   font-size:0.9em;
   opacity:.8;
+  display:none; /* 🔒 */
 }
 </style>
 </head>
@@ -85,12 +90,16 @@ button{
 <div class="container">
   <h1>NOUR</h1>
 
-  <p id="paragraph">Loading...</p>
-
+  <!-- 🔐 شاشة القفل -->
   <div id="lock">
     <input type="password" id="pass" placeholder="Enter password">
     <button onclick="unlock()">Unlock</button>
     <div id="error"></div>
+  </div>
+
+  <!-- 🔒 المحتوى المخفي -->
+  <div id="content">
+    <p id="paragraph"></p>
   </div>
 
   <canvas id="scratch"></canvas>
@@ -99,113 +108,104 @@ button{
 </div>
 
 <script>
-// ============================
+// =====================
 // CONFIG
-// ============================
+// =====================
 const SHEET_ID = "1Lunrna_CRR3EUdiGW0csT0LNa97P7GEneZM_-NRTo8g";
 
-// ============================
-// GLOBALS
-// ============================
+// =====================
 let todayPassword = "";
 let unlocked = false;
 
-// ============================
-// SHOW DATE
-// ============================
+// =====================
+// DATE (مخفي)
 document.getElementById("date").innerText =
   "📅 " + new Date().toLocaleDateString("en-GB");
 
-// ============================
-// FETCH GOOGLE SHEET
-// ============================
+// =====================
+// FETCH SHEET
 fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`)
-.then(res => res.text())
-.then(txt => {
-  const json = JSON.parse(txt.substring(47).slice(0, -2));
+.then(r=>r.text())
+.then(t=>{
+  const json = JSON.parse(t.substring(47).slice(0,-2));
   const rows = json.table.rows;
 
   const start = new Date("2025-01-01");
   const today = new Date();
-  const dayIndex =
-    Math.floor((today - start) / (1000 * 60 * 60 * 24)) % rows.length;
+  const index =
+    Math.floor((today-start)/(1000*60*60*24)) % rows.length;
 
-  // MESSAGE
   document.getElementById("paragraph").innerText =
-    rows[dayIndex].c[0]?.v || "";
+    rows[index].c[0]?.v || "";
 
-  // PASSWORD (SAFE)
-  todayPassword = rows[dayIndex].c[1]?.v
-    ? rows[dayIndex].c[1].v.toString().trim()
+  todayPassword = rows[index].c[1]?.v
+    ? rows[index].c[1].v.toString().trim()
     : "";
-
-  console.log("Today's password:", todayPassword); // للاختبار فقط
 });
 
-// ============================
-// PASSWORD CHECK
-// ============================
+// =====================
+// UNLOCK
 function unlock(){
   const input = document.getElementById("pass").value.trim();
 
   if(input === todayPassword && input !== ""){
     unlocked = true;
-    document.getElementById("lock").style.display = "none";
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // إخفاء القفل
+    document.getElementById("lock").style.display="none";
+
+    // إظهار المحتوى
+    document.getElementById("content").style.display="block";
+    document.getElementById("date").style.display="block";
+    canvas.style.display="block";
+
+    initScratch();
   }else{
-    document.getElementById("error").innerText = "❌ Wrong password";
+    document.getElementById("error").innerText="❌ Wrong password";
   }
 }
 
-// ============================
-// SCRATCH CARD
-// ============================
+// =====================
+// SCRATCH
 const canvas = document.getElementById("scratch");
 const ctx = canvas.getContext("2d");
 
-function resize(){
+function initScratch(){
   canvas.width = canvas.offsetWidth;
   canvas.height = canvas.offsetHeight;
-  ctx.fillStyle = "#666";
+
+  ctx.globalCompositeOperation="source-over";
+  ctx.fillStyle="#666";
   ctx.fillRect(0,0,canvas.width,canvas.height);
 }
-resize();
-window.addEventListener("resize", resize);
 
-let drawing = false;
+let drawing=false;
 
 function getPos(e){
-  const r = canvas.getBoundingClientRect();
-  const t = e.touches ? e.touches[0] : e;
-  return { x: t.clientX - r.left, y: t.clientY - r.top };
+  const r=canvas.getBoundingClientRect();
+  const t=e.touches?e.touches[0]:e;
+  return {x:t.clientX-r.left,y:t.clientY-r.top};
 }
 
 function scratch(e){
   if(!drawing || !unlocked) return;
-  const p = getPos(e);
-  ctx.globalCompositeOperation = "destination-out";
+  const p=getPos(e);
+  ctx.globalCompositeOperation="destination-out";
   ctx.beginPath();
-  ctx.arc(p.x, p.y, 30, 0, Math.PI * 2);
+  ctx.arc(p.x,p.y,30,0,Math.PI*2);
   ctx.fill();
 }
 
 // Mouse
-canvas.addEventListener("mousedown",()=>drawing=true);
-canvas.addEventListener("mouseup",()=>drawing=false);
-canvas.addEventListener("mouseleave",()=>drawing=false);
-canvas.addEventListener("mousemove", scratch);
+canvas.onmousedown=()=>drawing=true;
+canvas.onmouseup=()=>drawing=false;
+canvas.onmouseleave=()=>drawing=false;
+canvas.onmousemove=scratch;
 
 // Touch
-canvas.addEventListener("touchstart",e=>{
-  drawing=true;
-  scratch(e);
-  e.preventDefault();
-});
-canvas.addEventListener("touchend",()=>drawing=false);
-canvas.addEventListener("touchmove",e=>{
-  scratch(e);
-  e.preventDefault();
-});
+canvas.ontouchstart=e=>{drawing=true;scratch(e);e.preventDefault();}
+canvas.ontouchend=()=>drawing=false;
+canvas.ontouchmove=e=>{scratch(e);e.preventDefault();}
 </script>
 
 </body>
