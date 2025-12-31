@@ -3,125 +3,171 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nour Scratch Card 💖</title>
+<title>Nour Scratch 💖</title>
+
 <style>
-body {
-  margin:0; padding:0;
-  font-family: 'Cursive', sans-serif;
-  display:flex; justify-content:center; align-items:center;
+body{
+  margin:0;
+  font-family:cursive;
+  background:radial-gradient(circle,#2b003d,#5a005f,#7f007f);
   height:100vh;
-  background: radial-gradient(circle at center, #2b003d, #5a005f, #7f007f);
-  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:white;
 }
+
 .container{
   position:relative;
-  text-align:center;
+  width:90%;
   max-width:900px;
-  padding:60px;
+  padding:40px;
+  background:rgba(0,0,0,.3);
   border-radius:25px;
-  background:rgba(0,0,0,0.25);
-  box-shadow:0 15px 60px rgba(0,0,0,0.7);
-  backdrop-filter: blur(8px);
-  overflow:hidden;
+  text-align:center;
+  box-shadow:0 20px 60px rgba(0,0,0,.7);
 }
+
 h1{
-  font-size:6em;
-  font-weight:bold;
+  font-size:4em;
   color:#ff79c6;
-  text-shadow: 0 0 10px #ff79c6, 0 0 20px #b07dd3;
-  margin-bottom:40px;
 }
+
 #paragraph{
-  font-size:1.8em;
-  line-height:2.4em;
-  max-width:800px;
-  margin:0 auto;
-  position:relative;
+  font-size:1.6em;
+  margin:30px 0;
 }
+
 canvas{
   position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
+  inset:0;
   border-radius:25px;
-  cursor: pointer;
-  touch-action: none;
+  touch-action:none;
+}
+
+#lock{
+  margin-top:20px;
+}
+
+input{
+  padding:10px;
+  font-size:1em;
+  border-radius:10px;
+  border:none;
+  outline:none;
+}
+
+button{
+  padding:10px 20px;
+  border:none;
+  border-radius:10px;
+  background:#ff79c6;
+  color:white;
+  cursor:pointer;
+}
+
+#error{
+  color:#ffaaaa;
+  margin-top:10px;
+}
+
+#date{
+  margin-top:30px;
+  font-size:0.9em;
+  opacity:.8;
 }
 </style>
 </head>
+
 <body>
 
 <div class="container">
   <h1>NOUR</h1>
+
   <p id="paragraph">Loading...</p>
+
+  <div id="lock">
+    <input type="password" id="pass" placeholder="Enter password">
+    <button onclick="unlock()">Unlock</button>
+    <div id="error"></div>
+  </div>
+
   <canvas id="scratch"></canvas>
+
+  <div id="date"></div>
 </div>
 
 <script>
-// ——————————————
-// 1) جلب البيانات من Google Sheets
-// ضع معرف الشيت الخاص في السطر التالي:
-const SHEET_ID = "1Lunrna_CRR3EUdiGW0csT0LNa97P7GEneZM_-NRTo8g";
+const SHEET_ID="1Lunrna_CRR3EUdiGW0csT0LNa97P7GEneZM_-NRTo8g";
+let todayPassword="";
+let unlocked=false;
 
+// 📅 تاريخ اليوم
+document.getElementById("date").innerText=
+  "📅 " + new Date().toLocaleDateString("en-GB");
+
+// 🔹 جلب البيانات
 fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`)
-.then(res => res.text())
-.then(txt => {
-  const json = JSON.parse(txt.substr(47).slice(0,-2));
-  const rows = json.table.rows.map(r => r.c && r.c[0] && r.c[0].v);
+.then(r=>r.text())
+.then(t=>{
+  const json=JSON.parse(t.substr(47).slice(0,-2));
+  const rows=json.table.rows;
 
-  // حساب عبارة اليوم
-  const start = new Date('2025-01-01');
-  const today = new Date();
-  const days = Math.floor((today - start)/(1000*60*60*24));
-  const index = rows.length > 0 ? days % rows.length : 0;
+  const start=new Date("2025-01-01");
+  const today=new Date();
+  const index=Math.floor((today-start)/(1000*60*60*24))%rows.length;
 
-  document.getElementById('paragraph').textContent = rows[index] || "";
+  document.getElementById("paragraph").innerText=rows[index].c[0].v;
+  todayPassword=rows[index].c[1].v.toString();
 });
 
-// ——————————————
-// 2) Scratch Card
-const canvas = document.getElementById('scratch');
-const ctx = canvas.getContext('2d');
-const container = document.querySelector('.container');
-
-function resizeCanvas(){
-  canvas.width = container.clientWidth;
-  canvas.height = container.clientHeight;
-}
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
-
-// رسم الطبقة المغطّاة
-ctx.fillStyle = '#555';
-ctx.fillRect(0,0,canvas.width,canvas.height);
-
-let isDrawing = false;
-function getPos(e){
-  const rect = canvas.getBoundingClientRect();
-  if(e.touches){
-    return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+// 🔐 التحقق من كلمة السر
+function unlock(){
+  const input=document.getElementById("pass").value;
+  if(input===todayPassword){
+    unlocked=true;
+    document.getElementById("lock").style.display="none";
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+  }else{
+    document.getElementById("error").innerText="❌ Wrong password";
   }
-  return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+}
+
+// 🎨 Scratch
+const canvas=document.getElementById("scratch");
+const ctx=canvas.getContext("2d");
+
+function resize(){
+  canvas.width=canvas.offsetWidth;
+  canvas.height=canvas.offsetHeight;
+  ctx.fillStyle="#666";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+}
+resize();
+window.onresize=resize;
+
+let draw=false;
+function pos(e){
+  const r=canvas.getBoundingClientRect();
+  const t=e.touches?e.touches[0]:e;
+  return{x:t.clientX-r.left,y:t.clientY-r.top};
 }
 function scratch(e){
-  if(!isDrawing) return;
-  const pos = getPos(e);
+  if(!draw||!unlocked)return;
+  const p=pos(e);
   ctx.globalCompositeOperation="destination-out";
   ctx.beginPath();
-  ctx.arc(pos.x,pos.y,30,0,Math.PI*2);
+  ctx.arc(p.x,p.y,30,0,Math.PI*2);
   ctx.fill();
 }
 
-canvas.addEventListener('mousedown',()=>{ isDrawing=true });
-canvas.addEventListener('mouseup',()=>{ isDrawing=false });
-canvas.addEventListener('mouseleave',()=>{ isDrawing=false });
-canvas.addEventListener('mousemove', scratch);
+canvas.onmousedown=()=>draw=true;
+canvas.onmouseup=()=>draw=false;
+canvas.onmousemove=scratch;
 
-canvas.addEventListener('touchstart',(e)=>{ isDrawing=true; scratch(e); e.preventDefault(); });
-canvas.addEventListener('touchend',()=>{ isDrawing=false });
-canvas.addEventListener('touchmove',(e)=>{ scratch(e); e.preventDefault(); });
-
+canvas.ontouchstart=e=>{draw=true;scratch(e);e.preventDefault();}
+canvas.ontouchend=()=>draw=false;
+canvas.ontouchmove=e=>{scratch(e);e.preventDefault();}
 </script>
 
 </body>
