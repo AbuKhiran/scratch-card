@@ -1,158 +1,183 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daily Secret 💖</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مفاجأتي اليومية لخطيبتي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&family=Amiri:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --bg-color: #2e004e; 
+            --accent: #e0aaff; 
+        }
+        
+        body { 
+            margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center; 
+            background: var(--bg-color); transition: background 1.5s ease; 
+            font-family: 'Cairo', sans-serif; overflow: hidden; color: white;
+        }
+        
+        #lock-screen { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #1a0033; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; z-index: 100; transition: 0.8s ease; 
+        }
+        
+        .lock-box { text-align: center; padding: 20px; }
+        .lock-box input { 
+            padding: 15px; border-radius: 15px; border: 2px solid var(--accent); 
+            background: rgba(255,255,255,0.1); color: white; text-align: center; 
+            font-size: 1.5rem; width: 180px; outline: none; margin-top: 15px;
+        }
 
-<style>
-body{
-  margin:0;
-  font-family:cursive;
-  background:radial-gradient(circle,#2b003d,#5a005f,#7f007f);
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  color:white;
-}
-
-/* شاشة كلمة السر */
-#lockScreen{
-  text-align:center;
-}
-
-input{
-  padding:15px;
-  font-size:1.2em;
-  border-radius:12px;
-  border:none;
-  outline:none;
-}
-
-button{
-  padding:12px 30px;
-  margin-left:10px;
-  font-size:1.1em;
-  border:none;
-  border-radius:12px;
-  background:#ff79c6;
-  color:white;
-  cursor:pointer;
-}
-
-#error{
-  margin-top:15px;
-  color:#ffaaaa;
-}
-
-/* المحتوى بعد الفتح */
-#content{
-  display:none;
-  width:90%;
-  max-width:800px;
-  padding:40px;
-  background:rgba(0,0,0,.3);
-  border-radius:25px;
-  text-align:center;
-  box-shadow:0 20px 60px rgba(0,0,0,.7);
-}
-
-h1{
-  font-size:4em;
-  color:#ff79c6;
-  margin-bottom:20px;
-}
-
-#message{
-  font-size:1.6em;
-  line-height:2em;
-}
-
-#date{
-  margin-top:30px;
-  font-size:.9em;
-  opacity:.8;
-}
-</style>
+        .main-content { 
+            display: none; text-align: center; width: 100%; max-width: 400px; 
+            animation: fadeIn 1.2s ease-out; 
+        }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        h1 { color: white; margin-bottom: 20px; text-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        
+        .scratch-container { 
+            position: relative; width: 320px; height: 220px; margin: 0 auto; 
+            background: #fff; border-radius: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+            overflow: hidden; 
+        }
+        
+        .message-under { 
+            position: absolute; width: 100%; height: 100%; display: flex; 
+            justify-content: center; align-items: center; padding: 25px; 
+            box-sizing: border-box; text-align: center; color: #301934; 
+            font-family: 'Amiri', serif; font-size: 1.4rem; line-height: 1.6;
+        }
+        
+        #scratch-canvas { position: absolute; top: 0; left: 0; touch-action: none; border-radius: 25px; cursor: crosshair; }
+        .hint { color: var(--accent); margin-top: 25px; font-size: 0.9rem; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        .error { color: #ff4d6d; margin-top: 10px; display: none; font-size: 0.9rem; }
+    </style>
 </head>
-
 <body>
 
-<!-- 🔐 كلمة السر فقط -->
-<div id="lockScreen">
-  <input type="password" id="pass" placeholder="Enter password">
-  <button onclick="unlock()">Unlock</button>
-  <div id="error"></div>
-</div>
+    <div id="lock-screen">
+        <div class="lock-box">
+            <div style="font-size: 60px; margin-bottom: 10px;">🔐</div>
+            <h2 id="status-text">جاري مزامنة رسالتكِ...</h2>
+            <input type="password" id="pass-input" placeholder="كلمة السر" disabled>
+            <p id="error-msg" class="error">كلمة السر خاطئة يا حبيبتي</p>
+        </div>
+    </div>
 
-<!-- 🎁 المحتوى -->
-<div id="content">
-  <h1 id="name"></h1>
-  <p id="message"></p>
-  <div id="date"></div>
-</div>
+    <div class="main-content" id="main-content">
+        <h1 id="daily-title">عنوان اليوم</h1>
+        <div class="scratch-container">
+            <div class="message-under">
+                <p id="daily-message"></p>
+            </div>
+            <canvas id="scratch-canvas" width="320" height="220"></canvas>
+        </div>
+        <p class="hint">اقشطي الكرت بإصبعكِ لرؤية المفاجأة ✨</p>
+    </div>
 
-<script>
-// ======================
-// CONFIG
-// ======================
-const SHEET_ID = "1Lunrna_CRR3EUdiGW0csT0LNa97P7GEneZM_-NRTo8g";
+    <script>
+        // الرابط المشفر الخاص بك
+        const ENCODED_URL = "aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlI1ZkM3dVRBenU2MW9BMVdZVzQ0T29OME02eWZpX2pvMXlBMXc3MUlKQWZKZnRtWGJmakpMNVBLbXNSUURkTld3Y295WFRHUGNCOFRUaS9wdWI/Z2lkPTAmc2luZ2xlPXRydWUmb3V0cHV0PWNzdg=="; 
+        
+        let decoded = atob(ENCODED_URL);
+        // تحويل الرابط تلقائياً ليكون CSV صالح للتحميل
+        const CSV_URL = decoded.replace('/pubhtml', '/pub?output=csv');
 
-// ======================
-let todayPassword = "";
+        let correctPass = "";
+        
+        // جلب تاريخ اليوم بصيغة YYYY-MM-DD
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const todayStr = `${year}-${month}-${day}`;
 
-// ======================
-// DATE
-const todayISO = new Date().toISOString().slice(0,10);
-document.getElementById("date").innerText =
-  "📅 " + todayISO;
+        async function loadData() {
+            try {
+                // Fetch البيانات مع تجنب الـ Cache لضمان التحديث اليومي
+                const response = await fetch(CSV_URL + '&t=' + new Date().getTime());
+                if (!response.ok) throw new Error();
+                
+                const data = await response.text();
+                const rows = data.split('\n').map(row => row.split(',').map(c => c.trim().replace(/"/g, '')));
+                
+                // البحث عن تاريخ اليوم في العمود الأول
+                const todayData = rows.find(row => row[0] === todayStr);
 
-// ======================
-// FETCH GOOGLE SHEET
-fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`)
-.then(r => r.text())
-.then(t => {
-  const json = JSON.parse(t.substring(47).slice(0, -2));
-  const rows = json.table.rows.slice(1); // تجاهل العناوين
+                if (todayData) {
+                    correctPass = todayData[1]; 
+                    document.getElementById('daily-title').innerText = todayData[2]; 
+                    document.getElementById('daily-message').innerText = todayData[3]; 
+                    document.getElementById('status-text').innerText = "أدخلي كلمة السر لفتح الصندوق";
+                    document.getElementById('pass-input').disabled = false;
+                } else {
+                    document.getElementById('status-text').innerText = "لا توجد رسالة مبرمجة لهذا التاريخ: " + todayStr;
+                }
+            } catch (e) {
+                document.getElementById('status-text').innerText = "خطأ في الاتصال.. تأكدي من 'نشر' الملف كـ CSV";
+            }
+        }
 
-  const todayRow = rows.find(r =>
-    r.c[0]?.v === todayISO
-  );
+        document.getElementById('pass-input').addEventListener('input', function() {
+            if (this.value === correctPass) {
+                document.getElementById('lock-screen').style.transform = 'translateY(-100%)';
+                setTimeout(() => {
+                    document.getElementById('lock-screen').style.display = 'none';
+                    document.getElementById('main-content').style.display = 'block';
+                    initScratchCard();
+                }, 800);
+            } else if (this.value.length >= String(correctPass).length && this.value !== String(correctPass)) {
+                document.getElementById('error-msg').style.display = 'block';
+                setTimeout(() => { 
+                    document.getElementById('error-msg').style.display = 'none'; 
+                    this.value = ''; 
+                }, 1000);
+            }
+        });
 
-  if(!todayRow){
-    document.getElementById("error").innerText =
-      "❌ No data for today";
-    return;
-  }
+        const dailyColors = ['#2e004e', '#4b0082', '#6a0dad', '#800080', '#3c096c', '#5a189a', '#240046'];
+        document.documentElement.style.setProperty('--bg-color', dailyColors[new Date().getDay()]);
 
-  document.getElementById("name").innerText =
-    todayRow.c[1]?.v || "";
+        const canvas = document.getElementById('scratch-canvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
 
-  document.getElementById("message").innerText =
-    todayRow.c[2]?.v || "";
+        function initScratchCard() {
+            const grad = ctx.createLinearGradient(0, 0, 320, 220);
+            grad.addColorStop(0, '#c3a1ff'); 
+            grad.addColorStop(1, '#7b2cbf');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 320, 220);
+            ctx.fillStyle = "white";
+            ctx.font = "bold 20px Cairo";
+            ctx.textAlign = "center";
+            ctx.fillText("اقشطي هنا 💜", 160, 115);
+        }
 
-  todayPassword = todayRow.c[3]?.v
-    ? String(todayRow.c[3].v).trim().toLowerCase()
-    : "";
-});
+        function scratch(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath(); ctx.arc(x, y, 25, 0, Math.PI * 2); ctx.fill();
+        }
 
-// ======================
-// UNLOCK
-function unlock(){
-  const input = document.getElementById("pass").value
-    .trim()
-    .toLowerCase();
+        canvas.addEventListener('mousedown', () => isDrawing = true);
+        canvas.addEventListener('touchstart', () => isDrawing = true);
+        window.addEventListener('mouseup', () => isDrawing = false);
+        window.addEventListener('touchend', () => isDrawing = false);
+        canvas.addEventListener('mousemove', scratch);
+        canvas.addEventListener('touchmove', scratch);
 
-  if(input === todayPassword && input !== ""){
-    document.getElementById("lockScreen").style.display="none";
-    document.getElementById("content").style.display="block";
-  } else {
-    document.getElementById("error").innerText =
-      "❌ Wrong password";
-  }
-}
-</script>
-
+        loadData();
+    </script>
 </body>
 </html>
