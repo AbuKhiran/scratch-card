@@ -3,23 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مفاجأتي اليومية لخطيبتي</title>
+    <title>رسالتي اليومية لخطيبتي</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&family=Amiri:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg-color: #2e004e; --accent: #e0aaff; }
-        body { margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center; background: var(--bg-color); transition: background 1.5s ease; font-family: 'Cairo', sans-serif; overflow: hidden; color: white; }
+        :root { 
+            --bg-color: #2e004e; 
+            --accent: #e0aaff; 
+        }
         
-        #lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a0033; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; transition: 0.8s ease; }
+        body { 
+            margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center; 
+            background: var(--bg-color); transition: background 1.5s ease; 
+            font-family: 'Cairo', sans-serif; overflow: hidden; color: white;
+        }
+        
+        /* شاشة الحماية */
+        #lock-screen { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #1a0033; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; z-index: 100; transition: 0.8s ease-in-out; 
+        }
+        
         .lock-box { text-align: center; padding: 20px; }
-        .lock-box input { padding: 15px; border-radius: 15px; border: 2px solid var(--accent); background: rgba(255,255,255,0.1); color: white; text-align: center; font-size: 1.5rem; width: 180px; outline: none; margin-top: 15px; box-shadow: 0 0 20px rgba(224,170,255,0.2); }
+        .lock-box input { 
+            padding: 15px; border-radius: 15px; border: 2px solid var(--accent); 
+            background: rgba(255,255,255,0.1); color: white; text-align: center; 
+            font-size: 1.5rem; width: 180px; outline: none; margin-top: 15px;
+            box-shadow: 0 0 20px rgba(224, 170, 255, 0.2);
+        }
 
-        .main-content { display: none; text-align: center; width: 100%; max-width: 400px; animation: fadeIn 1.2s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        /* المحتوى الرئيسي */
+        .main-content { 
+            display: none; text-align: center; width: 100%; max-width: 400px; 
+            animation: fadeIn 1.2s ease-out; 
+        }
+        
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
         
         h1 { color: white; margin-bottom: 20px; text-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .scratch-container { position: relative; width: 320px; height: 220px; margin: 0 auto; background: #fff; border-radius: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow: hidden; }
-        .message-under { position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; padding: 25px; box-sizing: border-box; text-align: center; color: #301934; font-family: 'Amiri', serif; font-size: 1.4rem; line-height: 1.6; background-color: white; }
-        #scratch-canvas { position: absolute; top: 0; left: 0; touch-action: none; border-radius: 25px; cursor: crosshair; }
+        
+        .scratch-container { 
+            position: relative; width: 320px; height: 220px; margin: 0 auto; 
+            background: #fff; border-radius: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+            overflow: hidden; 
+        }
+        
+        .message-under { 
+            position: absolute; width: 100%; height: 100%; display: flex; 
+            justify-content: center; align-items: center; padding: 25px; 
+            box-sizing: border-box; text-align: center; color: #301934; 
+            font-family: 'Amiri', serif; font-size: 1.4rem; line-height: 1.6;
+            background: white;
+        }
+        
+        #scratch-canvas { 
+            position: absolute; top: 0; left: 0; touch-action: none; border-radius: 25px; 
+        }
         
         .hint { color: var(--accent); margin-top: 25px; font-size: 0.9rem; animation: pulse 2s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
@@ -31,7 +73,7 @@
     <div id="lock-screen">
         <div class="lock-box">
             <div style="font-size: 60px; margin-bottom: 10px;">🔐</div>
-            <h2 id="status-text">جاري مزامنة مفاجأتكِ...</h2>
+            <h2 id="status-text">انتظري قليلاً...</h2>
             <input type="password" id="pass-input" placeholder="كلمة السر" disabled>
             <p id="error-msg" class="error">كلمة السر خاطئة يا حبيبتي</p>
         </div>
@@ -45,16 +87,17 @@
             </div>
             <canvas id="scratch-canvas" width="320" height="220"></canvas>
         </div>
-        <p class="hint">اقشطي الكرت بإصبعكِ لرؤية السر ✨</p>
+        <p class="hint">اقشطي الكرت برقة ✨</p>
     </div>
 
     <script>
-        // الرابط الخاص بك
-        const API_URL = "https://script.google.com/macros/s/AKfycbyVsJg-pCKaBovUM7MSmubl37DnjzYELMBELHY889rDbyHWqUfP3bjR0Przqtd8QLvTJg/exec";
+        // الرابط الجديد الذي زودتني به
+        const API_URL = "https://script.google.com/macros/s/AKfycbxz5E5z8fZDa-zBKYAei-3CcyaBDWWrfH47OWzMiTCVVuOUi7oZBiycOXSNGkUpyN1HfQ/exec";
 
         let correctPass = "";
-
-        function getTodayDate() {
+        
+        // دالة لجلب تاريخ اليوم بصيغة YYYY-MM-DD
+        function getTodayStr() {
             const now = new Date();
             const y = now.getFullYear();
             const m = String(now.getMonth() + 1).padStart(2, '0');
@@ -63,52 +106,52 @@
         }
 
         async function loadData() {
-            const today = getTodayDate();
+            const today = getTodayStr();
             try {
-                // استخدام 'follow' للتعامل مع الـ Redirect الخاص بجوجل
-                const response = await fetch(API_URL, { redirect: 'follow' });
+                const response = await fetch(API_URL);
                 const data = await response.json();
                 
-                // البحث المرن عن التاريخ
+                // البحث عن السطر المطابق لتاريخ اليوم
                 const todayMsg = data.find(item => {
-                    let itemDate = item.Date || item.date || Object.values(item)[0];
-                    if (typeof itemDate === 'string' && itemDate.includes('T')) itemDate = itemDate.split('T')[0];
-                    // تنظيف أي مسافات زائدة
-                    return String(itemDate).trim() === today;
+                    let itemDate = item.Date || item.date;
+                    if (itemDate && itemDate.includes('T')) itemDate = itemDate.split('T')[0];
+                    return itemDate === today;
                 });
 
                 if (todayMsg) {
-                    correctPass = String(todayMsg.Password || todayMsg.password || Object.values(todayMsg)[1]);
-                    document.getElementById('daily-title').innerText = todayMsg.Title || todayMsg.title || Object.values(todayMsg)[2];
-                    document.getElementById('daily-message').innerText = todayMsg.Message || todayMsg.message || Object.values(todayMsg)[3];
-                    document.getElementById('status-text').innerText = "أدخلي كلمة السر لفتح الرسالة";
+                    correctPass = String(todayMsg.Password || todayMsg.password);
+                    document.getElementById('daily-title').innerText = todayMsg.Title || todayMsg.title;
+                    document.getElementById('daily-message').innerText = todayMsg.Message || todayMsg.message;
+                    document.getElementById('status-text').innerText = "أدخلي كلمة السر لرؤية المفاجأة";
                     document.getElementById('pass-input').disabled = false;
                 } else {
-                    document.getElementById('status-text').innerText = "لا توجد رسالة مبرمجة لليوم 💜";
+                    document.getElementById('status-text').innerText = "لا توجد رسالة لليوم 💜 (" + today + ")";
                 }
             } catch (e) {
-                console.error(e);
-                document.getElementById('status-text').innerText = "تأكدي من صلاحية رابط الـ API ونشره للجميع";
+                document.getElementById('status-text').innerText = "حدث خطأ في الاتصال بالسيرفر";
             }
         }
 
+        // التحقق من كلمة السر
         document.getElementById('pass-input').addEventListener('input', function() {
             if (this.value === correctPass) {
-                document.getElementById('lock-screen').style.transform = 'translateY(-100%)';
+                document.getElementById('lock-screen').style.opacity = '0';
                 setTimeout(() => {
                     document.getElementById('lock-screen').style.display = 'none';
                     document.getElementById('main-content').style.display = 'block';
                     initScratchCard();
-                }, 800);
-            } else if (this.value.length >= correctPass.length && correctPass !== "") {
+                }, 500);
+            } else if (this.value.length >= correctPass.length) {
                 document.getElementById('error-msg').style.display = 'block';
-                setTimeout(() => { document.getElementById('error-msg').style.display = 'none'; this.value = ''; }, 1000);
+                setTimeout(() => { document.getElementById('error-msg').style.display = 'none'; this.value = ''; }, 1200);
             }
         });
 
+        // تغيير اللون حسب اليوم
         const dailyColors = ['#2e004e', '#4b0082', '#6a0dad', '#800080', '#3c096c', '#5a189a', '#240046'];
         document.documentElement.style.setProperty('--bg-color', dailyColors[new Date().getDay()]);
 
+        // نظام القشط
         const canvas = document.getElementById('scratch-canvas');
         const ctx = canvas.getContext('2d');
         let isDrawing = false;
