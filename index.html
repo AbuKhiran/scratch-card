@@ -4,67 +4,77 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Daily Surprise for My Queen</title>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --bg-color: #2e004e; 
-            --accent: #e0aaff; 
-        }
+        :root { --bg-color: #2e004e; --accent: #e0aaff; }
         
         body { 
-            margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center; 
+            margin: 0; min-height: 100vh; display: flex; justify-content: center; align-items: center; 
             background: var(--bg-color); transition: background 1.5s ease; 
-            font-family: 'Poppins', sans-serif; overflow: hidden; color: white;
+            font-family: 'Poppins', sans-serif; color: white; padding: 20px; box-sizing: border-box;
         }
         
-        /* Lock Screen */
         #lock-screen { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: #1a0033; display: flex; flex-direction: column; 
             justify-content: center; align-items: center; z-index: 100; transition: 0.8s ease; 
         }
         
-        .lock-box { text-align: center; padding: 20px; }
         .lock-box input { 
             padding: 15px; border-radius: 15px; border: 2px solid var(--accent); 
             background: rgba(255,255,255,0.1); color: white; text-align: center; 
             font-size: 1.2rem; width: 200px; outline: none; margin-top: 15px;
-            letter-spacing: 2px;
         }
 
-        /* Main Content */
         .main-content { 
-            display: none; text-align: center; width: 100%; max-width: 400px; 
+            display: none; text-align: center; width: 100%; max-width: 500px; 
             animation: fadeIn 1.2s ease-out; 
         }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
         h1 { 
-            font-family: 'Dancing Script', cursive; 
-            font-size: 2.5rem; color: white; margin-bottom: 20px; 
-            text-shadow: 0 4px 10px rgba(0,0,0,0.3); 
+            font-family: 'Dancing Script', cursive; font-size: 2.5rem; 
+            margin-bottom: 20px; text-shadow: 0 4px 10px rgba(0,0,0,0.3); 
         }
         
-        /* Scratch Card */
-        .scratch-container { 
-            position: relative; width: 320px; height: 220px; margin: 0 auto; 
-            background: #fff; border-radius: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
-            overflow: hidden; 
+        /* الحاوية المرنة الجديدة */
+        .scratch-outer {
+            position: relative;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 350px;
+            background: #fff;
+            border-radius: 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            overflow: hidden;
         }
-        
+
         .message-under { 
-            position: absolute; width: 100%; height: 100%; display: flex; 
-            justify-content: center; align-items: center; padding: 25px; 
-            box-sizing: border-box; text-align: center; color: #301934; 
-            font-size: 1.1rem; line-height: 1.6; font-weight: 500;
+            width: 100%;
+            padding: 40px 25px; 
+            box-sizing: border-box; 
+            text-align: center; 
+            color: #301934; 
+            font-size: 1.1rem; 
+            line-height: 1.8; 
+            font-weight: 400;
+            white-space: pre-wrap; /* يحافظ على تقسيم الأسطر */
+            word-wrap: break-word;
+            min-height: 150px;
+            display: block;
         }
         
-        #scratch-canvas { position: absolute; top: 0; left: 0; touch-action: none; border-radius: 25px; }
+        #scratch-canvas { 
+            position: absolute; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%;
+            touch-action: none; 
+            cursor: crosshair;
+        }
         
-        .hint { color: var(--accent); margin-top: 25px; font-size: 0.9rem; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-        .error { color: #ff4d6d; margin-top: 10px; display: none; font-size: 0.8rem; }
+        .hint { color: var(--accent); margin-top: 25px; font-size: 0.9rem; }
+        .error { color: #ff4d6d; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
@@ -74,49 +84,35 @@
             <div style="font-size: 60px; margin-bottom: 10px;">✨</div>
             <h2 id="status-text">Whispering to the stars...</h2>
             <input type="password" id="pass-input" placeholder="Secret Key" disabled>
-            <p id="error-msg" class="error">That's not it, my love. Try again!</p>
+            <p id="error-msg" class="error">Not it, my love. Try again!</p>
         </div>
     </div>
 
     <div class="main-content" id="main-content">
-        <h1 id="daily-title">Today's Grace</h1>
-        <div class="scratch-container">
-            <div class="message-under">
-                <p id="daily-message"></p>
+        <h1 id="daily-title">Today's Surprise</h1>
+        <div class="scratch-outer" id="scratch-box">
+            <div class="message-under" id="message-text">
+                <span id="daily-message"></span>
             </div>
-            <canvas id="scratch-canvas" width="320" height="220"></canvas>
+            <canvas id="scratch-canvas"></canvas>
         </div>
         <p class="hint">Scratch gently to reveal your surprise ✨</p>
     </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxz5E5z8fZDa-zBKYAei-3CcyaBDWWrfH47OWzMiTCVVuOUi7oZBiycOXSNGkUpyN1HfQ/exec";
-
         let correctPass = "";
         
-        function getTodayStr() {
-            const now = new Date();
-            const y = now.getFullYear();
-            const m = String(now.getMonth() + 1).padStart(2, '0');
-            const d = String(now.getDate()).padStart(2, '0');
-            return `${y}-${m}-${d}`;
-        }
-
         async function loadData() {
-            const today = getTodayStr();
+            const today = new Date().toISOString().split('T')[0];
             try {
                 const response = await fetch(API_URL);
                 const data = await response.json();
-                
-                const todayMsg = data.find(item => {
-                    let itemDate = item.Date || item.date;
-                    if (itemDate && itemDate.includes('T')) itemDate = itemDate.split('T')[0];
-                    return itemDate === today;
-                });
+                const todayMsg = data.find(item => (item.Date || item.date || "").split('T')[0] === today);
 
                 if (todayMsg) {
                     correctPass = String(todayMsg.Password || todayMsg.password);
-                    document.getElementById('daily-title').innerText = todayMsg.Title || todayMsg.title;
+                    document.getElementById('daily-title').innerText = todayMsg.Title || "Today's Grace";
                     document.getElementById('daily-message').innerText = todayMsg.Message || todayMsg.message;
                     document.getElementById('status-text').innerText = "Unlock your daily magic";
                     document.getElementById('pass-input').disabled = false;
@@ -124,7 +120,7 @@
                     document.getElementById('status-text').innerText = "A new secret is blooming soon...";
                 }
             } catch (e) {
-                document.getElementById('status-text').innerText = "Connection lost... Check your heart(link)";
+                document.getElementById('status-text').innerText = "Connecting to your heart...";
             }
         }
 
@@ -134,27 +130,30 @@
                 setTimeout(() => {
                     document.getElementById('lock-screen').style.display = 'none';
                     document.getElementById('main-content').style.display = 'block';
-                    initScratchCard();
+                    setupCanvas(); // تشغيل الكانفاس بعد ظهور النص
                 }, 500);
-            } else if (this.value.length >= correctPass.length) {
-                document.getElementById('error-msg').style.display = 'block';
-                setTimeout(() => { document.getElementById('error-msg').style.display = 'none'; this.value = ''; }, 1500);
             }
         });
 
-        const dailyColors = ['#2e004e', '#4b0082', '#6a0dad', '#800080', '#3c096c', '#5a189a', '#240046'];
-        document.documentElement.style.setProperty('--bg-color', dailyColors[new Date().getDay()]);
-
+        // إعداد القماش (Canvas) ليتناسب مع حجم النص
         const canvas = document.getElementById('scratch-canvas');
         const ctx = canvas.getContext('2d');
         let isDrawing = false;
 
-        function initScratchCard() {
-            const grad = ctx.createLinearGradient(0, 0, 320, 220);
+        function setupCanvas() {
+            const box = document.getElementById('scratch-box');
+            canvas.width = box.offsetWidth;
+            canvas.height = box.offsetHeight;
+
+            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
             grad.addColorStop(0, '#e0aaff'); grad.addColorStop(1, '#7b2cbf');
-            ctx.fillStyle = grad; ctx.fillRect(0, 0, 320, 220);
-            ctx.fillStyle = "white"; ctx.font = "bold 18px Poppins"; ctx.textAlign = "center";
-            ctx.fillText("Reveal your gift 💜", 160, 115);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = "white";
+            ctx.font = "bold 18px Poppins";
+            ctx.textAlign = "center";
+            ctx.fillText("Reveal your gift 💜", canvas.width/2, canvas.height/2);
         }
 
         function scratch(e) {
@@ -163,7 +162,9 @@
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath(); ctx.arc(clientX - rect.left, clientY - rect.top, 25, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath();
+            ctx.arc(clientX - rect.left, clientY - rect.top, 30, 0, Math.PI * 2);
+            ctx.fill();
         }
 
         canvas.addEventListener('mousedown', () => isDrawing = true);
@@ -171,7 +172,7 @@
         window.addEventListener('mouseup', () => isDrawing = false);
         window.addEventListener('touchend', () => isDrawing = false);
         canvas.addEventListener('mousemove', scratch);
-        canvas.addEventListener('touchmove', scratch);
+        canvas.addEventListener('touchmove', (e) => { scratch(e); e.preventDefault(); }, { passive: false });
 
         loadData();
     </script>
