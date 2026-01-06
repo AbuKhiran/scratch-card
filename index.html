@@ -3,28 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Our Daily Story</title>
+    <title>Daily Surprise for My Queen</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&family=Amiri:ital,wght@1,700&display=swap" rel="stylesheet">
     <style>
         :root { --bg-color: #2e004e; --accent: #e0aaff; }
         
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
         body { 
-            margin: 0; 
-            height: 100vh; 
-            height: -webkit-fill-available; /* حل لمشكلة ارتفاع شاشة الايفون */
-            display: flex; 
-            flex-direction: column;
-            justify-content: center; 
-            align-items: center; 
-            background: var(--bg-color); 
-            font-family: 'Poppins', sans-serif; 
-            color: white; 
-            padding: 20px;
-            overflow: hidden; /* يمنع التمرير ليبقى كل شيء في المركز */
+            margin: 0; min-height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; background: var(--bg-color); 
+            font-family: 'Poppins', sans-serif; color: white; padding: 15px; 
+            box-sizing: border-box; text-align: center; overflow-x: hidden;
         }
 
+        /* عداد الوقت في أعلى الشاشة */
+        #top-counter {
+            position: fixed;
+            top: 10px;
+            width: 100%;
+            font-size: 0.75rem;
+            font-weight: 300;
+            color: var(--accent);
+            letter-spacing: 1px;
+            z-index: 50;
+            background: rgba(0,0,0,0.1);
+            padding: 5px 0;
+            backdrop-filter: blur(2px);
+        }
+        
         /* شاشة القفل */
         #lock-screen { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
@@ -32,89 +37,56 @@
             justify-content: center; align-items: center; z-index: 100; transition: 0.8s ease; 
         }
         
-        .lock-box { width: 100%; max-width: 300px; text-align: center; }
         .lock-box input { 
-            padding: 16px; border-radius: 20px; border: 2px solid var(--accent); 
+            padding: 18px; border-radius: 20px; border: 2px solid var(--accent); 
             background: rgba(255,255,255,0.05); color: white; text-align: center; 
-            font-size: 1.2rem; width: 100%; outline: none; margin-top: 15px;
+            font-size: 1.2rem; width: 250px; outline: none; margin-top: 15px;
         }
 
-        /* المحتوى الرئيسي */
-        .main-content { 
-            display: none; 
-            width: 100%; 
-            max-width: 400px; 
-            text-align: center;
-            animation: fadeIn 1s ease;
-        }
+        .main-content { display: none; width: 100%; max-width: 380px; animation: fadeIn 1.2s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        h1 { font-family: 'Dancing Script', cursive; font-size: 2.3rem; margin-bottom: 20px; margin-top: 40px; }
 
-        h1 { 
-            font-family: 'Dancing Script', cursive; 
-            font-size: calc(1.8rem + 1vw); 
-            margin: 0 0 15px 0; 
-        }
-
-        /* حاوية القشط المرنة */
         .scratch-outer {
-            position: relative;
-            width: 100%;
-            background: #fff;
-            border-radius: 25px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-            overflow: hidden;
-            aspect-ratio: 3 / 2; /* يحافظ على تناسب المربع في كل الهواتف */
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position: relative; margin: 0 auto; width: 100%; background: #fff;
+            border-radius: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
         }
 
         .message-under { 
-            width: 100%; height: 100%;
-            padding: 20px; 
-            display: flex; flex-direction: column;
+            width: 100%; padding: 40px 20px; box-sizing: border-box; color: #301934; 
+            display: flex; flex-direction: column; gap: 15px; min-height: 200px;
             justify-content: center; align-items: center;
-            gap: 12px;
-            color: #301934;
-            text-align: center;
         }
 
-        #daily-message { font-size: 1rem; line-height: 1.5; font-weight: 600; }
+        #daily-message { font-size: 1.05rem; line-height: 1.6; font-weight: 600; }
         #daily-translation { 
-            font-family: 'Amiri', serif; font-size: 1.1rem; color: #6a0dad; 
-            border-top: 1px dashed #ddd; padding-top: 8px; width: 90%;
+            font-family: 'Amiri', serif; font-size: 1.15rem; color: #6a0dad; 
+            font-style: italic; border-top: 1px dashed #ddd; padding-top: 10px; width: 100%;
         }
-
-        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: none; }
-
-        /* عداد الأيام بتصميم عصري */
-        .counter-box {
-            margin-top: 20px;
-            padding: 12px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 18px;
-            border: 1px solid rgba(224, 170, 255, 0.15);
-            width: 100%;
-        }
-        .counter-text { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
-        .counter-number { font-size: 1.5rem; font-weight: 600; display: block; color: var(--accent); }
-
-        .hint { margin-top: 15px; font-size: 0.8rem; opacity: 0.6; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        #scratch-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: none; }
+        
+        .hint { color: var(--accent); margin-top: 20px; font-size: 0.8rem; opacity: 0.7; }
+        .error { color: #ff4d6d; margin-top: 10px; font-size: 0.85rem; display: none; }
     </style>
 </head>
 <body>
 
+    <div id="top-counter">Loading our story...</div>
+
     <div id="lock-screen">
         <div class="lock-box">
-            <div style="font-size: 50px; margin-bottom: 10px;">✨</div>
-            <h2 id="status-text" style="font-weight: 300; font-size: 1.1rem;">Waiting for you...</h2>
+            <div style="font-size: 50px; margin-bottom: 15px;">💜</div>
+            <h2 id="status-text">Whispering to the stars...</h2>
             <input type="password" id="pass-input" placeholder="Secret Key" disabled>
+            <p id="error-msg" class="error">Not it, my love. Try again!</p>
         </div>
     </div>
 
     <div class="main-content" id="main-content">
-        <h1 id="daily-title">Today's Heart</h1>
+        <h1 id="daily-title">Today's Grace</h1>
         
         <div class="scratch-outer" id="scratch-box">
             <div class="message-under">
@@ -124,44 +96,55 @@
             <canvas id="scratch-canvas"></canvas>
         </div>
 
-        <div class="counter-box">
-            <span class="counter-text">Days of Us</span>
-            <span class="counter-number" id="days-count">0 Days</span>
-        </div>
-
-        <p class="hint">Scratch the card gently 💜</p>
+        <p class="hint">Scratch gently to reveal your surprise ✨</p>
     </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxz5E5z8fZDa-zBKYAei-3CcyaBDWWrfH47OWzMiTCVVuOUi7oZBiycOXSNGkUpyN1HfQ/exec";
         let correctPass = "";
         
-        function calculateDays() {
-            const start = new Date("2025-10-03");
-            const now = new Date();
-            const diff = Math.floor((now - start) / (1000 * 60 * 60 * 24));
-            document.getElementById('days-count').innerText = diff + " Days";
+        // عداد الوقت من 3 أكتوبر 2025 الساعة 4:00 مساءً
+        function startLiveCounter() {
+            const startDate = new Date("2025-10-03T16:00:00").getTime();
+            
+            setInterval(() => {
+                const now = new Date().getTime();
+                const diff = now - startDate;
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('top-counter').innerHTML = 
+                    `${days}d ${hours}h ${minutes}m ${seconds}s of loving you`;
+            }, 1000);
         }
 
         async function loadData() {
-            const today = new Date().toISOString().split('T')[0];
+            const now = new Date();
+            const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+            
             try {
                 const response = await fetch(API_URL);
                 const data = await response.json();
-                const item = data.find(i => (i.Date || i.date || "").split('T')[0] === today);
+                const todayMsg = data.find(item => {
+                    let d = item.Date || item.date || "";
+                    return d.split('T')[0] === today;
+                });
 
-                if (item) {
-                    correctPass = String(item.Password || item.password).trim();
-                    document.getElementById('daily-title').innerText = item.Title || "Surprise";
-                    document.getElementById('daily-message').innerText = item.Message || "";
-                    document.getElementById('daily-translation').innerText = item.Translation || "";
-                    document.getElementById('status-text').innerText = "Unlock your magic";
+                if (todayMsg) {
+                    correctPass = String(todayMsg.Password || todayMsg.password).trim();
+                    document.getElementById('daily-title').innerText = todayMsg.Title || "Surprise";
+                    document.getElementById('daily-message').innerText = todayMsg.Message || todayMsg.message;
+                    document.getElementById('daily-translation').innerText = todayMsg.Translation || "";
+                    document.getElementById('status-text').innerText = "Unlock your daily magic";
                     document.getElementById('pass-input').disabled = false;
                 } else {
-                    document.getElementById('status-text').innerText = "Next secret coming soon...";
+                    document.getElementById('status-text').innerText = "A new secret is blooming...";
                 }
             } catch (e) {
-                document.getElementById('status-text').innerText = "Connection error...";
+                document.getElementById('status-text').innerText = "Connecting to your heart...";
             }
         }
 
@@ -171,7 +154,6 @@
                 setTimeout(() => {
                     document.getElementById('lock-screen').style.display = 'none';
                     document.getElementById('main-content').style.display = 'block';
-                    calculateDays();
                     setupCanvas();
                 }, 500);
             }
@@ -187,32 +169,29 @@
             canvas.height = box.clientHeight;
             const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
             grad.addColorStop(0, '#e0aaff'); grad.addColorStop(1, '#7b2cbf');
-            ctx.fillStyle = grad; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "white"; ctx.font = "bold 16px Poppins"; ctx.textAlign = "center";
-            ctx.fillText("Scratch with Love 💜", canvas.width/2, canvas.height/2 + 6);
-        }
-
-        function getPos(e) {
-            const rect = canvas.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            return { x: clientX - rect.left, y: clientY - rect.top };
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "white"; ctx.font = "600 16px Poppins"; ctx.textAlign = "center";
+            ctx.fillText("Scratch Here 💜", canvas.width/2, canvas.height/2 + 5);
         }
 
         function scratch(e) {
             if (!isDrawing) return;
-            const { x, y } = getPos(e);
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+            const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
             ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath(); ctx.arc(x, y, 25, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x, y, 30, 0, Math.PI * 2); ctx.fill();
         }
 
         canvas.addEventListener('mousedown', () => isDrawing = true);
-        canvas.addEventListener('touchstart', (e) => { isDrawing = true; e.preventDefault(); }, {passive: false});
+        canvas.addEventListener('touchstart', () => isDrawing = true);
         window.addEventListener('mouseup', () => isDrawing = false);
         window.addEventListener('touchend', () => isDrawing = false);
         canvas.addEventListener('mousemove', scratch);
-        canvas.addEventListener('touchmove', (e) => { scratch(e); e.preventDefault(); }, {passive: false});
+        canvas.addEventListener('touchmove', (e) => { scratch(e); e.preventDefault(); }, { passive: false });
 
+        startLiveCounter();
         loadData();
     </script>
 </body>
