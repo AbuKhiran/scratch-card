@@ -13,18 +13,18 @@
             min-height: 100vh; 
             display: flex; 
             flex-direction: column;
-            justify-content: center; /* توسيط عمودي */
-            align-items: center;     /* توسيط أفقي */
+            justify-content: center; 
+            align-items: center;     
             background: var(--bg-color); 
-            transition: background 1.5s ease; 
             font-family: 'Poppins', sans-serif; 
             color: white; 
-            padding: 20px; 
+            padding: 15px; /* مسافة أمان للجوانب */
             box-sizing: border-box;
             text-align: center;
+            overflow-x: hidden; /* منع التمرير الأفقي */
         }
         
-        /* شاشة القفل المحسنة */
+        /* شاشة القفل */
         #lock-screen { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: #1a0033; 
@@ -33,55 +33,57 @@
             z-index: 100; transition: 0.8s ease; 
         }
         
-        .lock-box { width: 100%; max-width: 300px; }
-        .lock-box h2 { font-weight: 300; font-size: 1.1rem; margin-bottom: 20px; }
+        .lock-box { width: 90%; max-width: 320px; }
         
         .lock-box input { 
-            padding: 15px; border-radius: 20px; border: 2px solid var(--accent); 
+            padding: 18px; border-radius: 20px; border: 2px solid var(--accent); 
             background: rgba(255,255,255,0.05); color: white; text-align: center; 
-            font-size: 1.2rem; width: 80%; outline: none;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            font-size: 1.2rem; width: 100%; outline: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            box-sizing: border-box;
         }
 
         /* المحتوى الرئيسي */
         .main-content { 
             display: none; 
             width: 100%; 
-            max-width: 400px; 
+            max-width: 380px; /* عرض مثالي لشاشات الهاتف */
             animation: fadeIn 1.2s ease-out; 
         }
         
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         h1 { 
-            font-family: 'Dancing Script', cursive; font-size: 2.8rem; 
-            margin: 0 0 25px 0; text-shadow: 0 4px 15px rgba(0,0,0,0.4); 
+            font-family: 'Dancing Script', cursive; 
+            font-size: calc(2rem + 2vw); /* حجم خط مرن */
+            margin: 0 0 20px 0; 
+            text-shadow: 0 4px 15px rgba(0,0,0,0.4); 
         }
         
-        /* حاوية القشط المرنة والمركزة */
+        /* حاوية القشط المتجاوبة */
         .scratch-outer {
             position: relative;
             margin: 0 auto;
-            width: 100%;
+            width: 100%; /* تأخذ كامل عرض الأب (380px) */
             background: #fff;
-            border-radius: 30px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+            border-radius: 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
             overflow: hidden;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
         }
 
         .message-under { 
             width: 100%;
-            padding: 50px 30px; 
+            padding: 40px 20px; 
             box-sizing: border-box; 
             color: #301934; 
-            font-size: 1.15rem; 
-            line-height: 1.8; 
+            font-size: 1.1rem; 
+            line-height: 1.7; 
             white-space: pre-wrap; 
             word-wrap: break-word;
-            min-height: 180px;
+            min-height: 200px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -91,42 +93,40 @@
             position: absolute; 
             top: 0; left: 0; 
             width: 100%; height: 100%;
-            touch-action: none; 
-            cursor: crosshair;
+            touch-action: none; /* ضروري جداً للموبايل لمنع الصفحة من التحرك أثناء القشط */
         }
         
         .hint { 
             color: var(--accent); 
-            margin-top: 30px; 
-            font-size: 0.95rem; 
-            font-weight: 300;
-            letter-spacing: 1px;
+            margin-top: 20px; 
+            font-size: 0.9rem; 
             opacity: 0.8;
+            padding: 0 10px;
         }
 
-        .error { color: #ff4d6d; margin-top: 15px; font-size: 0.85rem; display: none; }
+        .error { color: #ff4d6d; margin-top: 15px; font-size: 0.85rem; }
     </style>
 </head>
 <body>
 
     <div id="lock-screen">
         <div class="lock-box">
-            <div style="font-size: 65px; margin-bottom: 20px;">💜</div>
-            <h2 id="status-text">Whispering to the stars...</h2>
+            <div style="font-size: 50px; margin-bottom: 15px;">💜</div>
+            <h2 id="status-text" style="font-weight: 300; font-size: 1rem; margin-bottom: 20px;">Fetching your daily magic...</h2>
             <input type="password" id="pass-input" placeholder="Secret Key" disabled>
-            <p id="error-msg" class="error">Not it, my love. Try again!</p>
+            <p id="error-msg" class="error" style="display:none;">Not it, my love. Try again!</p>
         </div>
     </div>
 
     <div class="main-content" id="main-content">
-        <h1 id="daily-title">Today's Surprise</h1>
+        <h1 id="daily-title">Surprise</h1>
         <div class="scratch-outer" id="scratch-box">
             <div class="message-under">
                 <span id="daily-message"></span>
             </div>
             <canvas id="scratch-canvas"></canvas>
         </div>
-        <p class="hint">Scratch gently to reveal your surprise ✨</p>
+        <p class="hint">Scratch the card to see my heart ✨</p>
     </div>
 
     <script>
@@ -134,20 +134,25 @@
         let correctPass = "";
         
         async function loadData() {
-            const today = new Date().toISOString().split('T')[0];
+            const now = new Date();
+            const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+            
             try {
                 const response = await fetch(API_URL);
                 const data = await response.json();
-                const todayMsg = data.find(item => (item.Date || item.date || "").split('T')[0] === today);
+                const todayMsg = data.find(item => {
+                    let d = item.Date || item.date || "";
+                    return d.split('T')[0] === today;
+                });
 
                 if (todayMsg) {
                     correctPass = String(todayMsg.Password || todayMsg.password).trim();
                     document.getElementById('daily-title').innerText = todayMsg.Title || "Today's Grace";
                     document.getElementById('daily-message').innerText = todayMsg.Message || todayMsg.message;
-                    document.getElementById('status-text').innerText = "Unlock your daily magic";
+                    document.getElementById('status-text').innerText = "Enter your secret key";
                     document.getElementById('pass-input').disabled = false;
                 } else {
-                    document.getElementById('status-text').innerText = "A new secret is blooming soon...";
+                    document.getElementById('status-text').innerText = "Your next surprise is blooming...";
                 }
             } catch (e) {
                 document.getElementById('status-text').innerText = "Connecting to your heart...";
@@ -157,7 +162,6 @@
         document.getElementById('pass-input').addEventListener('input', function() {
             if (this.value.trim() === correctPass) {
                 document.getElementById('lock-screen').style.opacity = '0';
-                document.getElementById('lock-screen').style.pointerEvents = 'none';
                 setTimeout(() => {
                     document.getElementById('lock-screen').style.display = 'none';
                     document.getElementById('main-content').style.display = 'block';
@@ -172,8 +176,8 @@
 
         function setupCanvas() {
             const box = document.getElementById('scratch-box');
-            canvas.width = box.offsetWidth;
-            canvas.height = box.offsetHeight;
+            canvas.width = box.clientWidth;
+            canvas.height = box.clientHeight;
 
             const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
             grad.addColorStop(0, '#e0aaff'); 
@@ -182,19 +186,25 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
             ctx.fillStyle = "white";
-            ctx.font = "600 18px Poppins";
+            ctx.font = "600 16px Poppins";
             ctx.textAlign = "center";
-            ctx.fillText("Reveal your gift 💜", canvas.width/2, canvas.height/2 + 7);
+            ctx.fillText("Scratch Here 💜", canvas.width/2, canvas.height/2 + 5);
+        }
+
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: (e.touches ? e.touches[0].clientX : e.clientX) - rect.left,
+                y: (e.touches ? e.touches[0].clientY : e.clientY) - rect.top
+            };
         }
 
         function scratch(e) {
             if (!isDrawing) return;
-            const rect = canvas.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const pos = getMousePos(e);
             ctx.globalCompositeOperation = 'destination-out';
             ctx.beginPath();
-            ctx.arc(clientX - rect.left, clientY - rect.top, 35, 0, Math.PI * 2);
+            ctx.arc(pos.x, pos.y, 30, 0, Math.PI * 2);
             ctx.fill();
         }
 
@@ -203,9 +213,17 @@
         window.addEventListener('mouseup', () => isDrawing = false);
         window.addEventListener('touchend', () => isDrawing = false);
         canvas.addEventListener('mousemove', scratch);
-        canvas.addEventListener('touchmove', (e) => { scratch(e); e.preventDefault(); }, { passive: false });
+        canvas.addEventListener('touchmove', (e) => { 
+            scratch(e); 
+            e.preventDefault(); // يمنع اهتزاز الصفحة في الموبايل عند القشط
+        }, { passive: false });
 
         loadData();
+        
+        // إعادة ضبط الحجم عند تدوير الشاشة
+        window.addEventListener('resize', () => {
+            if(document.getElementById('main-content').style.display === 'block') setupCanvas();
+        });
     </script>
 </body>
 </html>
