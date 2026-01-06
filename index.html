@@ -4,107 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Daily Surprise for My Queen</title>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&family=Amiri:ital,wght@1,700&display=swap" rel="stylesheet">
     <style>
         :root { --bg-color: #2e004e; --accent: #e0aaff; }
         
         body { 
-            margin: 0; 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column;
-            justify-content: center; 
-            align-items: center;     
-            background: var(--bg-color); 
-            font-family: 'Poppins', sans-serif; 
-            color: white; 
-            padding: 15px; /* مسافة أمان للجوانب */
-            box-sizing: border-box;
-            text-align: center;
-            overflow-x: hidden; /* منع التمرير الأفقي */
+            margin: 0; min-height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; background: var(--bg-color); 
+            font-family: 'Poppins', sans-serif; color: white; padding: 15px; 
+            box-sizing: border-box; text-align: center; overflow-x: hidden;
         }
         
         /* شاشة القفل */
         #lock-screen { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #1a0033; 
-            display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; 
-            z-index: 100; transition: 0.8s ease; 
+            background: #1a0033; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; z-index: 100; transition: 0.8s ease; 
         }
-        
-        .lock-box { width: 90%; max-width: 320px; }
         
         .lock-box input { 
             padding: 18px; border-radius: 20px; border: 2px solid var(--accent); 
             background: rgba(255,255,255,0.05); color: white; text-align: center; 
-            font-size: 1.2rem; width: 100%; outline: none;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            box-sizing: border-box;
+            font-size: 1.2rem; width: 250px; outline: none; margin-top: 15px;
         }
 
-        /* المحتوى الرئيسي */
-        .main-content { 
-            display: none; 
-            width: 100%; 
-            max-width: 380px; /* عرض مثالي لشاشات الهاتف */
-            animation: fadeIn 1.2s ease-out; 
-        }
-        
+        .main-content { display: none; width: 100%; max-width: 380px; animation: fadeIn 1.2s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        h1 { 
-            font-family: 'Dancing Script', cursive; 
-            font-size: calc(2rem + 2vw); /* حجم خط مرن */
-            margin: 0 0 20px 0; 
-            text-shadow: 0 4px 15px rgba(0,0,0,0.4); 
-        }
-        
-        /* حاوية القشط المتجاوبة */
+        h1 { font-family: 'Dancing Script', cursive; font-size: 2.5rem; margin-bottom: 15px; }
+
+        /* حاوية القشط */
         .scratch-outer {
-            position: relative;
-            margin: 0 auto;
-            width: 100%; /* تأخذ كامل عرض الأب (380px) */
-            background: #fff;
-            border-radius: 25px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position: relative; margin: 0 auto; width: 100%; background: #fff;
+            border-radius: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
         }
 
         .message-under { 
-            width: 100%;
-            padding: 40px 20px; 
-            box-sizing: border-box; 
-            color: #301934; 
-            font-size: 1.1rem; 
-            line-height: 1.7; 
-            white-space: pre-wrap; 
-            word-wrap: break-word;
-            min-height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        #scratch-canvas { 
-            position: absolute; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%;
-            touch-action: none; /* ضروري جداً للموبايل لمنع الصفحة من التحرك أثناء القشط */
-        }
-        
-        .hint { 
-            color: var(--accent); 
-            margin-top: 20px; 
-            font-size: 0.9rem; 
-            opacity: 0.8;
-            padding: 0 10px;
+            width: 100%; padding: 40px 20px; box-sizing: border-box; color: #301934; 
+            display: flex; flex-direction: column; gap: 15px; min-height: 200px;
+            justify-content: center; align-items: center;
         }
 
-        .error { color: #ff4d6d; margin-top: 15px; font-size: 0.85rem; }
+        #daily-message { font-size: 1.1rem; line-height: 1.6; font-weight: 600; }
+        
+        #daily-translation { 
+            font-family: 'Amiri', serif; font-size: 1.2rem; color: #6a0dad; 
+            font-style: italic; border-top: 1px dashed #ddd; padding-top: 10px; width: 100%;
+        }
+        
+        #scratch-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: none; }
+        
+        /* عداد الأيام */
+        .counter-box {
+            margin-top: 25px; padding: 15px; background: rgba(255,255,255,0.1);
+            border-radius: 20px; border: 1px solid rgba(224, 170, 255, 0.2);
+            backdrop-filter: blur(5px);
+        }
+        .counter-text { font-size: 0.9rem; font-weight: 300; letter-spacing: 1px; color: var(--accent); }
+        .counter-number { font-size: 1.4rem; font-weight: 600; display: block; margin-top: 5px; }
+
+        .hint { color: var(--accent); margin-top: 15px; font-size: 0.8rem; opacity: 0.7; }
+        .error { color: #ff4d6d; margin-top: 10px; font-size: 0.85rem; display: none; }
     </style>
 </head>
 <body>
@@ -112,20 +73,28 @@
     <div id="lock-screen">
         <div class="lock-box">
             <div style="font-size: 50px; margin-bottom: 15px;">💜</div>
-            <h2 id="status-text" style="font-weight: 300; font-size: 1rem; margin-bottom: 20px;">Fetching your daily magic...</h2>
+            <h2 id="status-text">Our Story Continues...</h2>
             <input type="password" id="pass-input" placeholder="Secret Key" disabled>
-            <p id="error-msg" class="error" style="display:none;">Not it, my love. Try again!</p>
+            <p id="error-msg" class="error">Not it, my love. Try again!</p>
         </div>
     </div>
 
     <div class="main-content" id="main-content">
-        <h1 id="daily-title">Surprise</h1>
+        <h1 id="daily-title">Today's Grace</h1>
+        
         <div class="scratch-outer" id="scratch-box">
             <div class="message-under">
                 <span id="daily-message"></span>
+                <span id="daily-translation"></span>
             </div>
             <canvas id="scratch-canvas"></canvas>
         </div>
+
+        <div class="counter-box">
+            <span class="counter-text">Days of loving you</span>
+            <span class="counter-number" id="days-count">0</span>
+        </div>
+
         <p class="hint">Scratch the card to see my heart ✨</p>
     </div>
 
@@ -133,6 +102,15 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbxz5E5z8fZDa-zBKYAei-3CcyaBDWWrfH47OWzMiTCVVuOUi7oZBiycOXSNGkUpyN1HfQ/exec";
         let correctPass = "";
         
+        // حساب الأيام من تاريخ 3-10-2025
+        function updateCounter() {
+            const startDate = new Date("2025-10-03");
+            const today = new Date();
+            const diffTime = Math.abs(today - startDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            document.getElementById('days-count').innerText = diffDays + " Days";
+        }
+
         async function loadData() {
             const now = new Date();
             const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
@@ -147,12 +125,13 @@
 
                 if (todayMsg) {
                     correctPass = String(todayMsg.Password || todayMsg.password).trim();
-                    document.getElementById('daily-title').innerText = todayMsg.Title || "Today's Grace";
+                    document.getElementById('daily-title').innerText = todayMsg.Title || "Surprise";
                     document.getElementById('daily-message').innerText = todayMsg.Message || todayMsg.message;
+                    document.getElementById('daily-translation').innerText = todayMsg.Translation || "";
                     document.getElementById('status-text').innerText = "Enter your secret key";
                     document.getElementById('pass-input').disabled = false;
                 } else {
-                    document.getElementById('status-text').innerText = "Your next surprise is blooming...";
+                    document.getElementById('status-text').innerText = "A new secret is blooming...";
                 }
             } catch (e) {
                 document.getElementById('status-text').innerText = "Connecting to your heart...";
@@ -165,6 +144,7 @@
                 setTimeout(() => {
                     document.getElementById('lock-screen').style.display = 'none';
                     document.getElementById('main-content').style.display = 'block';
+                    updateCounter();
                     setupCanvas();
                 }, 500);
             }
@@ -178,52 +158,31 @@
             const box = document.getElementById('scratch-box');
             canvas.width = box.clientWidth;
             canvas.height = box.clientHeight;
-
             const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            grad.addColorStop(0, '#e0aaff'); 
-            grad.addColorStop(1, '#7b2cbf');
+            grad.addColorStop(0, '#e0aaff'); grad.addColorStop(1, '#7b2cbf');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            ctx.fillStyle = "white";
-            ctx.font = "600 16px Poppins";
-            ctx.textAlign = "center";
+            ctx.fillStyle = "white"; ctx.font = "600 16px Poppins"; ctx.textAlign = "center";
             ctx.fillText("Scratch Here 💜", canvas.width/2, canvas.height/2 + 5);
-        }
-
-        function getMousePos(e) {
-            const rect = canvas.getBoundingClientRect();
-            return {
-                x: (e.touches ? e.touches[0].clientX : e.clientX) - rect.left,
-                y: (e.touches ? e.touches[0].clientY : e.clientY) - rect.top
-            };
         }
 
         function scratch(e) {
             if (!isDrawing) return;
-            const pos = getMousePos(e);
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+            const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
             ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath();
-            ctx.arc(pos.x, pos.y, 30, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.beginPath(); ctx.arc(x, y, 30, 0, Math.PI * 2); ctx.fill();
         }
 
         canvas.addEventListener('mousedown', () => isDrawing = true);
-        canvas.addEventListener('touchstart', (e) => { isDrawing = true; });
+        canvas.addEventListener('touchstart', () => isDrawing = true);
         window.addEventListener('mouseup', () => isDrawing = false);
         window.addEventListener('touchend', () => isDrawing = false);
         canvas.addEventListener('mousemove', scratch);
-        canvas.addEventListener('touchmove', (e) => { 
-            scratch(e); 
-            e.preventDefault(); // يمنع اهتزاز الصفحة في الموبايل عند القشط
-        }, { passive: false });
+        canvas.addEventListener('touchmove', (e) => { scratch(e); e.preventDefault(); }, { passive: false });
 
         loadData();
-        
-        // إعادة ضبط الحجم عند تدوير الشاشة
-        window.addEventListener('resize', () => {
-            if(document.getElementById('main-content').style.display === 'block') setupCanvas();
-        });
     </script>
 </body>
 </html>
