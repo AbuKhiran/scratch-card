@@ -3,90 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Daily Surprise for My Queen</title>
+    <title>For My Queen | Private Sanctuary</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&family=Amiri:ital,wght@1,700&display=swap" rel="stylesheet">
+
     <style>
-        :root { --bg-color: #2e004e; --accent: #e0aaff; }
+        :root { 
+            --bg-color: #0d001a; 
+            --accent: #e0aaff; 
+            --glass: rgba(255, 255, 255, 0.08);
+            --error: #ff4d4d;
+        }
         
         body { 
             margin: 0; min-height: 100vh; display: flex; flex-direction: column;
             justify-content: center; align-items: center; background: var(--bg-color); 
             font-family: 'Poppins', sans-serif; color: white; padding: 15px; 
-            box-sizing: border-box; text-align: center; overflow-x: hidden;
+            box-sizing: border-box; text-align: center; overflow: hidden;
+            position: relative;
         }
 
-        /* عداد الوقت في أعلى الشاشة */
+        /* Moving Particles Background */
+        .background-particles {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #1a0033 0%, #0d001a 100%);
+            z-index: -1; overflow: hidden;
+        }
+
+        .particle {
+            position: absolute; background: rgba(224, 170, 255, 0.4);
+            border-radius: 50%; animation: moveParticles 15s infinite alternate;
+            filter: blur(2px); opacity: 0;
+        }
+
+        @keyframes moveParticles {
+            0% { transform: translate(0, 0) scale(0); opacity: 0; }
+            50% { opacity: 0.6; transform: translate(var(--x1), var(--y1)) scale(1); }
+            100% { transform: translate(var(--x2), var(--y2)) scale(0); opacity: 0; }
+        }
+
+        /* Top Counter (Revealed after login) */
         #top-counter {
-            position: fixed;
-            top: 10px;
-            width: 100%;
-            font-size: 0.75rem;
-            font-weight: 300;
-            color: var(--accent);
-            letter-spacing: 1px;
-            z-index: 50;
-            background: rgba(0,0,0,0.1);
-            padding: 5px 0;
-            backdrop-filter: blur(2px);
-        }
-        
-        /* شاشة القفل */
-        #lock-screen { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #1a0033; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; z-index: 100; transition: 0.8s ease; 
-        }
-        
-        .lock-box input { 
-            padding: 18px; border-radius: 20px; border: 2px solid var(--accent); 
-            background: rgba(255,255,255,0.05); color: white; text-align: center; 
-            font-size: 1.2rem; width: 250px; outline: none; margin-top: 15px;
+            position: fixed; top: 0; left: 0; width: 100%; padding: 20px 0;
+            font-size: 0.85rem; color: var(--accent); letter-spacing: 1.5px; z-index: 150;
+            background: linear-gradient(to bottom, rgba(13,0,26,0.9), transparent);
+            display: none; 
+            animation: fadeInDown 1s ease forwards;
         }
 
-        .main-content { display: none; width: 100%; max-width: 380px; animation: fadeIn 1.2s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Lock Screen Layout */
+        #lock-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center;
+            align-items: center; z-index: 100; transition: 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            background: transparent; 
+        }
+
+        .heart-icon { font-size: 50px; color: #e0aaff; margin-bottom: 20px; filter: drop-shadow(0 0 15px #e0aaff); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+        .lock-box input { 
+            padding: 18px; border-radius: 25px; border: 1.5px solid var(--accent); 
+            background: var(--glass); color: white; text-align: center; 
+            font-size: 1.1rem; width: 260px; outline: none; transition: 0.3s;
+            backdrop-filter: blur(15px);
+        }
+
+        .shake { animation: shake 0.4s !important; border-color: var(--error) !important; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        #error-msg { color: var(--error); font-size: 0.85rem; margin-top: 15px; display: none; }
+
+        /* Main Content Layout */
+        .main-content { 
+            display: none; width: 100%; max-width: 360px; z-index: 10; 
+            background: rgba(255, 255, 255, 0.03); border-radius: 30px; 
+            padding: 30px 15px; backdrop-filter: blur(5px);
+            margin-top: 40px; 
+        }
         
-        h1 { font-family: 'Dancing Script', cursive; font-size: 2.3rem; margin-bottom: 20px; margin-top: 40px; }
+        h1 { font-family: 'Dancing Script', cursive; font-size: 2.2rem; margin: 15px 0; color: var(--accent); }
 
         .scratch-outer {
-            position: relative; margin: 0 auto; width: 100%; background: #fff;
-            border-radius: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-            overflow: hidden; display: flex; align-items: center; justify-content: center;
+            position: relative; width: 100%; background: #fff; border-radius: 30px;
+            overflow: hidden; min-height: 250px; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.4);
         }
 
-        .message-under { 
-            width: 100%; padding: 40px 20px; box-sizing: border-box; color: #301934; 
-            display: flex; flex-direction: column; gap: 15px; min-height: 200px;
-            justify-content: center; align-items: center;
-        }
+        .message-under { width: 100%; padding: 40px 25px; color: #1a0033; display: flex; flex-direction: column; gap: 12px; }
+        #daily-message { font-size: 1.05rem; line-height: 1.6; font-weight: 600; color: #2e004e; }
+        #daily-translation { font-family: 'Amiri', serif; font-size: 1.3rem; color: #5a189a; border-top: 1px dashed #eee; padding-top: 15px; direction: rtl; }
+        #scratch-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: none; z-index: 10; }
 
-        #daily-message { font-size: 1.05rem; line-height: 1.6; font-weight: 600; }
-        #daily-translation { 
-            font-family: 'Amiri', serif; font-size: 1.15rem; color: #6a0dad; 
-            font-style: italic; border-top: 1px dashed #ddd; padding-top: 10px; width: 100%;
+        .nav-column { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+        .nav-btn {
+            background: var(--glass); border: 1px solid rgba(224, 170, 255, 0.3); color: white;
+            padding: 15px; border-radius: 20px; cursor: pointer; transition: 0.4s; width: 100%;
         }
-        
-        #scratch-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: none; }
-        
-        .hint { color: var(--accent); margin-top: 20px; font-size: 0.8rem; opacity: 0.7; }
-        .error { color: #ff4d6d; margin-top: 10px; font-size: 0.85rem; display: none; }
+        #today-btn { background: linear-gradient(45deg, #7b2cbf, #9d4edd); border: none; font-weight: 600; }
+        .nav-btn:disabled { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="top-counter">Loading our story...</div>
+    <div class="background-particles" id="particles-bg"></div>
+    
+    <div id="top-counter">Syncing Our Hearts...</div>
 
     <div id="lock-screen">
         <div class="lock-box">
-            <div style="font-size: 50px; margin-bottom: 15px;">💜</div>
-            <h2 id="status-text">Whispering to the stars...</h2>
+            <div class="heart-icon">💜</div>
+            <h2 style="font-weight: 300; font-size: 1rem; margin-bottom: 25px; color: var(--accent); letter-spacing: 1px;">Accessing My Queen's Private Space</h2>
             <input type="password" id="pass-input" placeholder="Secret Key" disabled>
-            <p id="error-msg" class="error">Not it, my love. Try again!</p>
+            <div id="error-msg">Incorrect key 😂😂😂 </div>
         </div>
     </div>
 
     <div class="main-content" id="main-content">
-        <h1 id="daily-title">Today's Grace</h1>
+        <div id="current-date-display" style="font-size: 0.85rem; color: var(--accent); margin-bottom: 5px;">Today</div>
+        <h1 id="daily-title">Loading...</h1>
+        <p style="color: var(--accent); font-size: 0.8rem; opacity: 0.7; margin-bottom: 15px;">Gently trace to unveil today's magic ✨</p>
         
         <div class="scratch-outer" id="scratch-box">
             <div class="message-under">
@@ -96,103 +142,181 @@
             <canvas id="scratch-canvas"></canvas>
         </div>
 
-        <p class="hint">Scratch gently to reveal your surprise ✨</p>
+        <div class="nav-column">
+            <button class="nav-btn" id="next-btn" onclick="changeDate(1)">Next Memory →</button>
+            <button class="nav-btn" id="today-btn" onclick="goBackToToday()">Today's Mystery ✨</button>
+            <button class="nav-btn" id="prev-btn" onclick="changeDate(-1)">← Previous Memory</button>
+        </div>
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbxz5E5z8fZDa-zBKYAei-3CcyaBDWWrfH47OWzMiTCVVuOUi7oZBiycOXSNGkUpyN1HfQ/exec";
+        // Use your Supabase URL and Key
+        const SB_URL = "https://ojghxuemcayanfdnyyqc.supabase.co";
+        const SB_KEY = "sb_publishable_aoLWIIzPn7P7o2HQSVxjmQ_fihINQg2";
+        const _supabase = supabase.createClient(SB_URL, SB_KEY);
+
         let correctPass = "";
-        
-        // عداد الوقت من 3 أكتوبر 2025 الساعة 4:00 مساءً
-        function startLiveCounter() {
-            const startDate = new Date("2025-10-03T16:00:00").getTime();
-            
+        let displayedDate = new Date();
+        const realTodayStr = new Date().toISOString().split('T')[0];
+        let hasScratchedToday = false;
+
+        // --- Security: Device Fingerprinting ---
+        function getDeviceFingerprint() {
+            let qid = localStorage.getItem('_q_secure_id');
+            if (!qid) {
+                qid = 'QID-' + Math.random().toString(36).substring(2, 10).toUpperCase() + '-' + Date.now();
+                localStorage.setItem('_q_secure_id', qid);
+            }
+            return qid;
+        }
+
+        async function sendLog(logType, details = "") {
+            try {
+                let userIp = "Hidden";
+                try {
+                    const ipRes = await fetch('https://api.ipify.org?format=json');
+                    const ipData = await ipRes.json();
+                    userIp = ipData.ip;
+                } catch (e) {}
+
+                const fingerprint = getDeviceFingerprint();
+                const screenRes = `${window.screen.width}x${window.screen.height}`;
+                const ua = navigator.userAgent;
+                let deviceName = /iPhone|iPad/i.test(ua) ? "iPhone" : (/Android/i.test(ua) ? "Android" : "Desktop");
+
+                // Mapping precisely to your provided SQL Table Structure
+                await _supabase.from('access_logs').insert([{
+                    ip: userIp,
+                    device: deviceName,
+                    device_id: fingerprint,
+                    screen: screenRes,
+                    type: logType,
+                    browser: details || ua.substring(0, 100),
+                    access_date: realTodayStr, // message_date / access_date context
+                    message_date: realTodayStr 
+                }]);
+            } catch (err) { console.error("Logger Failed", err); }
+        }
+
+        // --- Background Animation ---
+        function createParticles() {
+            const container = document.getElementById('particles-bg');
+            for (let i = 0; i < 30; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                p.style.width = p.style.height = `${Math.random() * 8 + 4}px`;
+                p.style.left = `${Math.random() * 100}%`;
+                p.style.top = `${Math.random() * 100}%`;
+                p.style.setProperty('--x1', `${Math.random() * 200 - 100}px`);
+                p.style.setProperty('--y1', `${Math.random() * 200 - 100}px`);
+                p.style.setProperty('--x2', `${Math.random() * 400 - 200}px`);
+                p.style.setProperty('--y2', `${Math.random() * 400 - 200}px`);
+                p.style.animationDelay = `${Math.random() * -15}s`;
+                container.appendChild(p);
+            }
+        }
+
+        // --- Live Counter (Since your first meeting) ---
+        function startCounter() {
+            const start = new Date("2025-10-03T15:40:00").getTime();
             setInterval(() => {
-                const now = new Date().getTime();
-                const diff = now - startDate;
-
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-                document.getElementById('top-counter').innerHTML = 
-                    `${days}d ${hours}h ${minutes}m ${seconds}s of loving you`;
+                const diff = new Date().getTime() - start;
+                const d = Math.floor(diff / 86400000);
+                const h = Math.floor((diff % 86400000) / 3600000);
+                const m = Math.floor((diff % 3600000) / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                document.getElementById('top-counter').innerText = `${d}d ${h}h ${m}m ${s}s of loving you`;
             }, 1000);
         }
 
-        async function loadData() {
-            const now = new Date();
-            const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
-            
-            try {
-                const response = await fetch(API_URL);
-                const data = await response.json();
-                const todayMsg = data.find(item => {
-                    let d = item.Date || item.date || "";
-                    return d.split('T')[0] === today;
-                });
+        async function loadData(dateObj) {
+            const dateStr = dateObj.toISOString().split('T')[0];
+            const isToday = (dateStr === realTodayStr);
+            document.getElementById('today-btn').disabled = isToday;
+            document.getElementById('next-btn').disabled = isToday;
 
-                if (todayMsg) {
-                    correctPass = String(todayMsg.Password || todayMsg.password).trim();
-                    document.getElementById('daily-title').innerText = todayMsg.Title || "Surprise";
-                    document.getElementById('daily-message').innerText = todayMsg.Message || todayMsg.message;
-                    document.getElementById('daily-translation').innerText = todayMsg.Translation || "";
-                    document.getElementById('status-text').innerText = "Unlock your daily magic";
+            const { data } = await _supabase.from('messages').select('*').eq('date', dateStr).single();
+            if (data) {
+                document.getElementById('daily-title').innerText = data.title;
+                document.getElementById('daily-message').innerText = data.message;
+                document.getElementById('daily-translation').innerText = data.translation;
+                if(isToday) {
+                    correctPass = String(data.password).trim();
                     document.getElementById('pass-input').disabled = false;
-                } else {
-                    document.getElementById('status-text').innerText = "A new secret is blooming...";
-                }
-            } catch (e) {
-                document.getElementById('status-text').innerText = "Connecting to your heart...";
+                    setupCanvas(!hasScratchedToday);
+                } else { setupCanvas(false); }
             }
         }
 
-        document.getElementById('pass-input').addEventListener('input', function() {
-            if (this.value.trim() === correctPass) {
-                document.getElementById('lock-screen').style.opacity = '0';
+        async function checkPass() {
+            const input = document.getElementById('pass-input');
+            const error = document.getElementById('error-msg');
+            const val = input.value.trim();
+
+            if (val === correctPass) {
+                sendLog('Success');
+                document.getElementById('top-counter').style.display = 'block';
+                document.getElementById('lock-screen').style.transform = 'translateY(-100%)';
                 setTimeout(() => {
                     document.getElementById('lock-screen').style.display = 'none';
                     document.getElementById('main-content').style.display = 'block';
-                    setupCanvas();
-                }, 500);
+                    setupCanvas(true);
+                }, 800);
+            } else if (val.length >= correctPass.length && correctPass !== "") {
+                sendLog('Failed Attempt', `Tried: ${val}`);
+                input.classList.add('shake');
+                error.style.display = 'block';
+                setTimeout(() => {
+                    input.classList.remove('shake');
+                    input.value = '';
+                }, 400);
             }
-        });
+        }
+
+        document.getElementById('pass-input').addEventListener('input', checkPass);
+
+        function changeDate(n) { displayedDate.setDate(displayedDate.getDate() + n); loadData(displayedDate); }
+        function goBackToToday() { displayedDate = new Date(); loadData(displayedDate); }
 
         const canvas = document.getElementById('scratch-canvas');
         const ctx = canvas.getContext('2d');
-        let isDrawing = false;
+        let drawing = false;
 
-        function setupCanvas() {
+        function setupCanvas(cover) {
             const box = document.getElementById('scratch-box');
-            canvas.width = box.clientWidth;
-            canvas.height = box.clientHeight;
-            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            grad.addColorStop(0, '#e0aaff'); grad.addColorStop(1, '#7b2cbf');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "white"; ctx.font = "600 16px Poppins"; ctx.textAlign = "center";
-            ctx.fillText("Scratch Here 💜", canvas.width/2, canvas.height/2 + 5);
+            if(!box) return;
+            canvas.width = box.clientWidth; canvas.height = box.clientHeight;
+            if (cover) {
+                canvas.style.display = "block";
+                const grad = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
+                grad.addColorStop(0, '#e0aaff'); grad.addColorStop(1, '#7b2cbf');
+                ctx.fillStyle = grad; ctx.fillRect(0,0,canvas.width,canvas.height);
+                ctx.fillStyle = "white"; ctx.font = "600 16px Poppins"; ctx.textAlign="center";
+                ctx.fillText("Trace to reveal today's magic 💜", canvas.width/2, canvas.height/2 + 5);
+            } else { canvas.style.display = "none"; }
         }
 
         function scratch(e) {
-            if (!isDrawing) return;
-            const rect = canvas.getBoundingClientRect();
-            const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-            const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+            if (!drawing) return;
+            const r = canvas.getBoundingClientRect();
+            const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+            const y = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
             ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath(); ctx.arc(x, y, 30, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x,y,35,0,Math.PI*2); ctx.fill();
+            hasScratchedToday = true;
         }
 
-        canvas.addEventListener('mousedown', () => isDrawing = true);
-        canvas.addEventListener('touchstart', () => isDrawing = true);
-        window.addEventListener('mouseup', () => isDrawing = false);
-        window.addEventListener('touchend', () => isDrawing = false);
+        canvas.addEventListener('mousedown', () => drawing = true);
+        canvas.addEventListener('touchstart', () => drawing = true);
+        window.addEventListener('mouseup', () => drawing = false);
+        window.addEventListener('touchend', () => drawing = false);
         canvas.addEventListener('mousemove', scratch);
-        canvas.addEventListener('touchmove', (e) => { scratch(e); e.preventDefault(); }, { passive: false });
+        canvas.addEventListener('touchmove', (e) => { scratch(e); e.preventDefault(); }, {passive: false});
 
-        startLiveCounter();
-        loadData();
+        createParticles();
+        startCounter();
+        loadData(new Date());
+        sendLog('Initial Visit');
     </script>
 </body>
 </html>
