@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>For My Queen | Private Sanctuary</title>
+    <title>For My Queen | Universal Access</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&family=Amiri:ital,wght@1,700&display=swap" rel="stylesheet">
@@ -16,15 +16,16 @@
             --error: #ff4d4d;
         }
         
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
         body { 
             margin: 0; min-height: 100vh; display: flex; flex-direction: column;
             justify-content: center; align-items: center; background: var(--bg-color); 
-            font-family: 'Poppins', sans-serif; color: white; padding: 15px; 
-            box-sizing: border-box; text-align: center; overflow: hidden;
-            position: relative;
+            font-family: 'Poppins', sans-serif; color: white; padding: 1rem; 
+            text-align: center; overflow: hidden; position: relative;
         }
 
-        /* Moving Particles Background */
+        /* Responsive Particles Background */
         .background-particles {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, #1a0033 0%, #0d001a 100%);
@@ -33,7 +34,7 @@
 
         .particle {
             position: absolute; background: rgba(224, 170, 255, 0.4);
-            border-radius: 50%; animation: moveParticles 15s infinite alternate;
+            border-radius: 50%; animation: moveParticles 15s infinite alternate linear;
             filter: blur(2px); opacity: 0;
         }
 
@@ -43,96 +44,102 @@
             100% { transform: translate(var(--x2), var(--y2)) scale(0); opacity: 0; }
         }
 
-        /* Top Counter (Revealed after login) */
+        /* Floating Counter */
         #top-counter {
-            position: fixed; top: 0; left: 0; width: 100%; padding: 20px 0;
-            font-size: 0.85rem; color: var(--accent); letter-spacing: 1.5px; z-index: 150;
-            background: linear-gradient(to bottom, rgba(13,0,26,0.9), transparent);
-            display: none; 
-            animation: fadeInDown 1s ease forwards;
+            position: fixed; top: 0; left: 0; width: 100%; padding: 1.5rem 0.5rem;
+            font-size: clamp(0.7rem, 2vw, 0.9rem); color: var(--accent); 
+            letter-spacing: 1px; z-index: 150;
+            background: linear-gradient(to bottom, rgba(13,0,26,0.95), transparent);
+            display: none; font-weight: 600;
         }
 
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Lock Screen Layout */
+        /* Adaptive Lock Screen */
         #lock-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; justify-content: center;
-            align-items: center; z-index: 100; transition: 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-            background: transparent; 
+            position: fixed; inset: 0; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 100;
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 2rem;
         }
 
-        .heart-icon { font-size: 50px; color: #e0aaff; margin-bottom: 20px; filter: drop-shadow(0 0 15px #e0aaff); animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+        .heart-icon { 
+            font-size: clamp(40px, 10vw, 60px); 
+            color: #e0aaff; margin-bottom: 1.5rem; 
+            filter: drop-shadow(0 0 15px #e0aaff); 
+            animation: pulse 2s infinite; 
+        }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+        .lock-box { width: 100%; max-width: 320px; }
 
         .lock-box input { 
-            padding: 18px; border-radius: 25px; border: 1.5px solid var(--accent); 
-            background: var(--glass); color: white; text-align: center; 
-            font-size: 1.1rem; width: 260px; outline: none; transition: 0.3s;
-            backdrop-filter: blur(15px);
+            width: 100%; padding: 1.2rem; border-radius: 50px; 
+            border: 2px solid var(--accent); background: var(--glass); 
+            color: white; text-align: center; font-size: 1.1rem; 
+            outline: none; transition: 0.3s; backdrop-filter: blur(15px);
         }
 
         .shake { animation: shake 0.4s !important; border-color: var(--error) !important; }
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
         }
 
-        #error-msg { color: var(--error); font-size: 0.85rem; margin-top: 15px; display: none; }
-
-        /* Main Content Layout */
+        /* Main Content Container */
         .main-content { 
-            display: none; width: 100%; max-width: 360px; z-index: 10; 
-            background: rgba(255, 255, 255, 0.03); border-radius: 30px; 
-            padding: 30px 15px; backdrop-filter: blur(5px);
-            margin-top: 40px; 
+            display: none; width: 100%; max-width: 450px; z-index: 10; 
+            background: rgba(255, 255, 255, 0.04); border-radius: 2rem; 
+            padding: 2rem 1.5rem; backdrop-filter: blur(10px);
+            margin-top: 3rem; border: 1px solid rgba(255,255,255,0.05);
         }
         
-        h1 { font-family: 'Dancing Script', cursive; font-size: 2.2rem; margin: 15px 0; color: var(--accent); }
+        h1 { font-family: 'Dancing Script', cursive; font-size: clamp(1.8rem, 5vw, 2.5rem); margin: 1rem 0; color: var(--accent); }
 
         .scratch-outer {
-            position: relative; width: 100%; background: #fff; border-radius: 30px;
-            overflow: hidden; min-height: 250px; display: flex; align-items: center; justify-content: center;
-            margin-bottom: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            position: relative; width: 100%; background: #fff; border-radius: 1.5rem;
+            overflow: hidden; min-height: 280px; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
 
-        .message-under { width: 100%; padding: 40px 25px; color: #1a0033; display: flex; flex-direction: column; gap: 12px; }
-        #daily-message { font-size: 1.05rem; line-height: 1.6; font-weight: 600; color: #2e004e; }
-        #daily-translation { font-family: 'Amiri', serif; font-size: 1.3rem; color: #5a189a; border-top: 1px dashed #eee; padding-top: 15px; direction: rtl; }
-        #scratch-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: none; z-index: 10; }
+        .message-under { width: 100%; padding: 2rem; color: #1a0033; display: flex; flex-direction: column; gap: 1rem; }
+        #daily-message { font-size: 1.1rem; line-height: 1.6; font-weight: 600; color: #2e004e; }
+        #daily-translation { font-family: 'Amiri', serif; font-size: 1.4rem; color: #5a189a; border-top: 1px dashed #ddd; padding-top: 1rem; direction: rtl; }
+        
+        #scratch-canvas { position: absolute; inset: 0; touch-action: none; z-index: 10; cursor: crosshair; }
 
-        .nav-column { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+        .nav-column { display: grid; grid-template-columns: 1fr; gap: 0.8rem; width: 100%; }
         .nav-btn {
-            background: var(--glass); border: 1px solid rgba(224, 170, 255, 0.3); color: white;
-            padding: 15px; border-radius: 20px; cursor: pointer; transition: 0.4s; width: 100%;
+            background: var(--glass); border: 1px solid rgba(224, 170, 255, 0.2); 
+            color: white; padding: 1rem; border-radius: 1rem; cursor: pointer; 
+            transition: 0.3s; font-size: 0.9rem; font-weight: 400;
         }
+        .nav-btn:hover { background: rgba(224, 170, 255, 0.15); }
         #today-btn { background: linear-gradient(45deg, #7b2cbf, #9d4edd); border: none; font-weight: 600; }
         .nav-btn:disabled { display: none; }
+
+        @media (min-width: 768px) {
+            .nav-column { grid-template-columns: 1fr 1fr; }
+            #today-btn { grid-column: span 2; order: -1; }
+        }
     </style>
 </head>
 <body>
 
     <div class="background-particles" id="particles-bg"></div>
-    
-    <div id="top-counter">Syncing Our Hearts...</div>
+    <div id="top-counter">Loading Eternity...</div>
 
     <div id="lock-screen">
         <div class="lock-box">
             <div class="heart-icon">💜</div>
-            <h2 style="font-weight: 300; font-size: 1rem; margin-bottom: 25px; color: var(--accent); letter-spacing: 1px;">Accessing My Queen's Private Space</h2>
-            <input type="password" id="pass-input" placeholder="Secret Key" disabled>
-            <div id="error-msg">Incorrect key 😂😂😂 </div>
+            <h2 style="font-weight: 300; font-size: 0.9rem; margin-bottom: 1.5rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px;">Private Space</h2>
+            <input type="password" id="pass-input" placeholder="Secret Key" autocomplete="off" disabled>
+            <div id="error-msg" style="color: var(--error); margin-top: 1rem; font-size: 0.8rem; display: none;">Wrong key 😂😂😂</div>
         </div>
     </div>
 
     <div class="main-content" id="main-content">
-        <div id="current-date-display" style="font-size: 0.85rem; color: var(--accent); margin-bottom: 5px;">Today</div>
-        <h1 id="daily-title">Loading...</h1>
-        <p style="color: var(--accent); font-size: 0.8rem; opacity: 0.7; margin-bottom: 15px;">Gently trace to unveil today's magic ✨</p>
+        <div id="current-date-display" style="font-size: 0.8rem; color: var(--accent); opacity: 0.8;">Date</div>
+        <h1 id="daily-title">Today's Magic</h1>
         
         <div class="scratch-outer" id="scratch-box">
             <div class="message-under">
@@ -143,14 +150,13 @@
         </div>
 
         <div class="nav-column">
-            <button class="nav-btn" id="next-btn" onclick="changeDate(1)">Next Memory →</button>
             <button class="nav-btn" id="today-btn" onclick="goBackToToday()">Today's Mystery ✨</button>
-            <button class="nav-btn" id="prev-btn" onclick="changeDate(-1)">← Previous Memory</button>
+            <button class="nav-btn" id="prev-btn" onclick="changeDate(-1)">← Older Memory</button>
+            <button class="nav-btn" id="next-btn" onclick="changeDate(1)">Newer Memory →</button>
         </div>
     </div>
 
     <script>
-        // Use your Supabase URL and Key
         const SB_URL = "https://ojghxuemcayanfdnyyqc.supabase.co";
         const SB_KEY = "sb_publishable_aoLWIIzPn7P7o2HQSVxjmQ_fihINQg2";
         const _supabase = supabase.createClient(SB_URL, SB_KEY);
@@ -160,7 +166,7 @@
         const realTodayStr = new Date().toISOString().split('T')[0];
         let hasScratchedToday = false;
 
-        // --- Security: Device Fingerprinting ---
+        // --- DEVICE FINGERPRINT & LOGGING ---
         function getDeviceFingerprint() {
             let qid = localStorage.getItem('_q_secure_id');
             if (!qid) {
@@ -182,9 +188,8 @@
                 const fingerprint = getDeviceFingerprint();
                 const screenRes = `${window.screen.width}x${window.screen.height}`;
                 const ua = navigator.userAgent;
-                let deviceName = /iPhone|iPad/i.test(ua) ? "iPhone" : (/Android/i.test(ua) ? "Android" : "Desktop");
+                let deviceName = /iPhone|iPad/i.test(ua) ? "iPhone" : (/Android/i.test(ua) ? "Android" : "Laptop/PC");
 
-                // Mapping precisely to your provided SQL Table Structure
                 await _supabase.from('access_logs').insert([{
                     ip: userIp,
                     device: deviceName,
@@ -192,31 +197,32 @@
                     screen: screenRes,
                     type: logType,
                     browser: details || ua.substring(0, 100),
-                    access_date: realTodayStr, // message_date / access_date context
+                    access_date: realTodayStr,
                     message_date: realTodayStr 
                 }]);
-            } catch (err) { console.error("Logger Failed", err); }
+            } catch (err) {}
         }
 
-        // --- Background Animation ---
+        // --- RESPONSIVE PARTICLES ---
         function createParticles() {
             const container = document.getElementById('particles-bg');
-            for (let i = 0; i < 30; i++) {
+            const count = window.innerWidth < 768 ? 20 : 40;
+            for (let i = 0; i < count; i++) {
                 const p = document.createElement('div');
                 p.classList.add('particle');
-                p.style.width = p.style.height = `${Math.random() * 8 + 4}px`;
+                p.style.width = p.style.height = `${Math.random() * 6 + 3}px`;
                 p.style.left = `${Math.random() * 100}%`;
                 p.style.top = `${Math.random() * 100}%`;
-                p.style.setProperty('--x1', `${Math.random() * 200 - 100}px`);
-                p.style.setProperty('--y1', `${Math.random() * 200 - 100}px`);
-                p.style.setProperty('--x2', `${Math.random() * 400 - 200}px`);
-                p.style.setProperty('--y2', `${Math.random() * 400 - 200}px`);
+                p.style.setProperty('--x1', `${Math.random() * 300 - 150}px`);
+                p.style.setProperty('--y1', `${Math.random() * 300 - 150}px`);
+                p.style.setProperty('--x2', `${Math.random() * 600 - 300}px`);
+                p.style.setProperty('--y2', `${Math.random() * 600 - 300}px`);
                 p.style.animationDelay = `${Math.random() * -15}s`;
                 container.appendChild(p);
             }
         }
 
-        // --- Live Counter (Since your first meeting) ---
+        // --- UNIVERSAL COUNTER ---
         function startCounter() {
             const start = new Date("2025-10-03T15:40:00").getTime();
             setInterval(() => {
@@ -225,13 +231,16 @@
                 const h = Math.floor((diff % 86400000) / 3600000);
                 const m = Math.floor((diff % 3600000) / 60000);
                 const s = Math.floor((diff % 60000) / 1000);
-                document.getElementById('top-counter').innerText = `${d}d ${h}h ${m}m ${s}s of loving you`;
+                document.getElementById('top-counter').innerHTML = `<b>${d}d ${h}h ${m}m ${s}s</b> of loving you`;
             }, 1000);
         }
 
         async function loadData(dateObj) {
             const dateStr = dateObj.toISOString().split('T')[0];
             const isToday = (dateStr === realTodayStr);
+            const options = { month: 'long', day: 'numeric', year: 'numeric' };
+            document.getElementById('current-date-display').innerText = dateObj.toLocaleDateString('en-US', options);
+            
             document.getElementById('today-btn').disabled = isToday;
             document.getElementById('next-btn').disabled = isToday;
 
@@ -254,30 +263,27 @@
             const val = input.value.trim();
 
             if (val === correctPass) {
-                sendLog('Success');
+                sendLog('Login Success');
                 document.getElementById('top-counter').style.display = 'block';
                 document.getElementById('lock-screen').style.transform = 'translateY(-100%)';
                 setTimeout(() => {
                     document.getElementById('lock-screen').style.display = 'none';
                     document.getElementById('main-content').style.display = 'block';
-                    setupCanvas(true);
+                    window.dispatchEvent(new Event('resize')); // Recalibrate Canvas
                 }, 800);
             } else if (val.length >= correctPass.length && correctPass !== "") {
-                sendLog('Failed Attempt', `Tried: ${val}`);
+                sendLog('Login Failed', `Tried: ${val}`);
                 input.classList.add('shake');
                 error.style.display = 'block';
-                setTimeout(() => {
-                    input.classList.remove('shake');
-                    input.value = '';
-                }, 400);
+                setTimeout(() => { input.classList.remove('shake'); input.value = ''; }, 400);
             }
         }
 
         document.getElementById('pass-input').addEventListener('input', checkPass);
-
         function changeDate(n) { displayedDate.setDate(displayedDate.getDate() + n); loadData(displayedDate); }
         function goBackToToday() { displayedDate = new Date(); loadData(displayedDate); }
 
+        // --- ADAPTIVE SCRATCH SYSTEM ---
         const canvas = document.getElementById('scratch-canvas');
         const ctx = canvas.getContext('2d');
         let drawing = false;
@@ -291,18 +297,27 @@
                 const grad = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
                 grad.addColorStop(0, '#e0aaff'); grad.addColorStop(1, '#7b2cbf');
                 ctx.fillStyle = grad; ctx.fillRect(0,0,canvas.width,canvas.height);
-                ctx.fillStyle = "white"; ctx.font = "600 16px Poppins"; ctx.textAlign="center";
-                ctx.fillText("Trace to reveal today's magic 💜", canvas.width/2, canvas.height/2 + 5);
+                ctx.fillStyle = "white"; ctx.font = "bold 16px Poppins"; ctx.textAlign="center";
+                ctx.fillText("Unveil Today's Message 💜", canvas.width/2, canvas.height/2 + 5);
             } else { canvas.style.display = "none"; }
+        }
+
+        function getPos(e) {
+            const r = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: clientX - r.left, y: clientY - r.top };
         }
 
         function scratch(e) {
             if (!drawing) return;
-            const r = canvas.getBoundingClientRect();
-            const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
-            const y = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
+            const pos = getPos(e);
             ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath(); ctx.arc(x,y,35,0,Math.PI*2); ctx.fill();
+            ctx.beginPath(); 
+            // Larger brush for touch screens
+            const radius = window.innerWidth < 768 ? 35 : 25;
+            ctx.arc(pos.x, pos.y, radius, 0, Math.PI*2); 
+            ctx.fill();
             hasScratchedToday = true;
         }
 
@@ -312,11 +327,14 @@
         window.addEventListener('touchend', () => drawing = false);
         canvas.addEventListener('mousemove', scratch);
         canvas.addEventListener('touchmove', (e) => { scratch(e); e.preventDefault(); }, {passive: false});
+        
+        // Handle resizing/rotation
+        window.addEventListener('resize', () => setupCanvas(!hasScratchedToday && document.getElementById('main-content').style.display === 'block'));
 
         createParticles();
         startCounter();
         loadData(new Date());
-        sendLog('Initial Visit');
+        sendLog('Device Visit');
     </script>
 </body>
 </html>
