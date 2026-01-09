@@ -28,7 +28,6 @@
 
         .background-particles { position: fixed; inset: 0; background: linear-gradient(135deg, #1a0033 0%, #0d001a 100%); z-index: -1; }
 
-        /* شريط عداد اللقاء - تصغير الحجم للجوال */
         #since-counter {
             position: fixed; top: 0; width: 100%; padding: 6px 2px;
             font-size: 10px; color: var(--accent); text-align: center;
@@ -36,7 +35,6 @@
             z-index: 150; display: none; backdrop-filter: blur(5px);
         }
 
-        /* شاشة القفل - متناسقة */
         #lock-screen { 
             position: fixed; inset: 0; display: flex; flex-direction: column; 
             justify-content: center; align-items: center; z-index: 200; text-align: center;
@@ -54,14 +52,12 @@
         .shake { animation: shake 0.4s ease-in-out; border-color: var(--error) !important; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
 
-        /* المحتوى الرئيسي - توزيع احترافي */
         .main-content { 
-            display: none; width: 100%; height: 100dvh; /* dvh لضمان التوافق مع متصفحات الجوال */
+            display: none; width: 100%; height: 100dvh; 
             flex-direction: column; align-items: center; 
             padding: 40px 15px 15px 15px;
         }
 
-        /* صندوق الزواج - ضغط الحجم للجوال */
         #wedding-box { width: 100%; max-width: 400px; margin-bottom: 10px; }
         .wedding-container {
             background: var(--glass); border: 1px solid rgba(224, 170, 255, 0.2);
@@ -73,13 +69,12 @@
         .unit-val { font-size: 14px; font-weight: 600; display: block; }
         .unit-label { font-size: 8px; color: var(--accent); text-transform: uppercase; }
 
-        /* صندوق القشط - يأخذ المساحة المتبقية بدقة */
         .scratch-outer { 
             position: relative; width: 100%; max-width: 400px; 
-            flex: 1; /* التمدد لملء الفراغ */
+            flex: 1; 
             margin: 10px 0; background: #fff; border-radius: 20px; 
             overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            min-height: 150px; /* الحد الأدنى لعدم الاختفاء */
+            min-height: 150px;
         }
         .message-under { 
             width: 100%; height: 100%; padding: 15px; color: #1a0033; 
@@ -91,7 +86,6 @@
         
         #scratch-canvas { position: absolute; inset: 0; z-index: 10; cursor: crosshair; touch-action: none; width: 100%; height: 100%; }
 
-        /* الأزرار في الأسفل */
         .nav-column { 
             display: grid; grid-template-columns: 1fr 1fr; gap: 8px; 
             width: 100%; max-width: 400px; margin-top: 5px;
@@ -164,6 +158,42 @@
         const ctx = canvas.getContext('2d');
         let drawing = false;
 
+        // --- وظيفة جلب المعرف والـ IP وتسجيل الدخول ---
+        async function logAccess() {
+            try {
+                // 1. جلب الـ IP
+                const ipRes = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipRes.json();
+                
+                // 2. تحليل المتصفح والجهاز
+                const ua = navigator.userAgent;
+                let browser = "Other";
+                if(ua.includes("Chrome")) browser = "Chrome";
+                else if(ua.includes("Safari") && !ua.includes("Chrome")) browser = "Safari";
+                else if(ua.includes("Firefox")) browser = "Firefox";
+
+                // 3. بصمة الجهاز الثابتة
+                let deviceId = localStorage.getItem('q_dev_id');
+                if(!deviceId) {
+                    deviceId = 'ID-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+                    localStorage.setItem('q_dev_id', deviceId);
+                }
+
+                // 4. الإرسال لجدول access_logs
+                await _supabase.from('access_logs').insert([{
+                    ip: ipData.ip,
+                    device: /iPhone|iPad|Android/i.test(ua) ? "Mobile" : "Desktop",
+                    browser: browser,
+                    screen: `${window.innerWidth}x${window.innerHeight}`,
+                    access_date: new Date().toISOString().split('T')[0],
+                    message_date: displayedDate.toISOString().split('T')[0],
+                    type: "LoginSuccess",
+                    device_id: deviceId,
+                    Person: "Queen"
+                }]);
+            } catch (e) { console.error("Log error", e); }
+        }
+
         function runSinceTimer() {
             const start = new Date("2025-10-03T16:18:00").getTime();
             setInterval(() => {
@@ -191,6 +221,7 @@
 
         function setupCanvas() {
             const box = document.getElementById('scratch-box');
+            if (!box || box.offsetWidth === 0) return;
             canvas.width = box.offsetWidth; 
             canvas.height = box.offsetHeight;
             ctx.globalCompositeOperation = 'source-over';
@@ -218,6 +249,7 @@
 
         document.getElementById('pass-input').addEventListener('input', function() {
             if (this.value.trim() === correctPass) {
+                logAccess(); // تنفيذ السجل
                 document.getElementById('lock-screen').style.display = 'none';
                 document.getElementById('main-content').style.display = 'flex';
                 document.getElementById('since-counter').style.display = 'block';
