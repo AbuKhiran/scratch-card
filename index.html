@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>For My Queen | Eternal Love</title>
+    <title>For My Queen</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&family=Amiri:ital,wght@1,700&display=swap" rel="stylesheet">
@@ -18,71 +18,85 @@
         }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        html, body { height: 100vh; width: 100vw; overflow: hidden; background: var(--bg-color); font-family: 'Poppins', sans-serif; color: white; }
+        html, body { 
+            height: 100%; width: 100%; 
+            overflow: hidden; 
+            background: var(--bg-color); 
+            font-family: 'Poppins', sans-serif; 
+            color: white; 
+        }
 
         .background-particles { position: fixed; inset: 0; background: linear-gradient(135deg, #1a0033 0%, #0d001a 100%); z-index: -1; }
 
+        /* شريط عداد اللقاء - تصغير الحجم للجوال */
         #since-counter {
-            position: fixed; top: 0; width: 100%; padding: 8px 5px;
-            font-size: clamp(0.7rem, 2vw, 0.85rem); color: var(--accent); text-align: center;
+            position: fixed; top: 0; width: 100%; padding: 6px 2px;
+            font-size: 10px; color: var(--accent); text-align: center;
             background: rgba(224, 170, 255, 0.1); border-bottom: 1px solid rgba(224, 170, 255, 0.2);
             z-index: 150; display: none; backdrop-filter: blur(5px);
         }
 
+        /* شاشة القفل - متناسقة */
         #lock-screen { 
             position: fixed; inset: 0; display: flex; flex-direction: column; 
             justify-content: center; align-items: center; z-index: 200; text-align: center;
-            background: var(--bg-color); transition: 0.5s;
+            background: var(--bg-color); padding: 20px;
         }
-        .main-welcome-title { font-family: 'Dancing Script', cursive; font-size: clamp(2.2rem, 8vw, 3.5rem); }
-        .heart-icon { font-size: 60px; filter: drop-shadow(0 0 15px #e0aaff); animation: pulse 2s infinite; margin: 20px 0; }
+        .main-welcome-title { font-family: 'Dancing Script', cursive; font-size: 2rem; margin-bottom: 10px; }
+        .heart-icon { font-size: 50px; filter: drop-shadow(0 0 10px #e0aaff); animation: pulse 2s infinite; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
         .lock-box input { 
-            width: 280px; padding: 15px; border-radius: 50px; 
+            width: 100%; max-width: 250px; padding: 12px; border-radius: 50px; 
             border: 2px solid var(--accent); background: var(--glass); 
-            color: white; text-align: center; outline: none; font-size: 1rem;
+            color: white; text-align: center; outline: none; margin-top: 20px; font-size: 14px;
         }
         .shake { animation: shake 0.4s ease-in-out; border-color: var(--error) !important; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
 
+        /* المحتوى الرئيسي - توزيع احترافي */
         .main-content { 
-            display: none; width: 100%; height: 100vh; flex-direction: column; align-items: center; 
-            padding: 60px 20px 20px 20px; justify-content: space-between;
+            display: none; width: 100%; height: 100dvh; /* dvh لضمان التوافق مع متصفحات الجوال */
+            flex-direction: column; align-items: center; 
+            padding: 40px 15px 15px 15px;
         }
 
-        #wedding-box { width: 100%; max-width: 500px; }
+        /* صندوق الزواج - ضغط الحجم للجوال */
+        #wedding-box { width: 100%; max-width: 400px; margin-bottom: 10px; }
         .wedding-container {
-            background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
-            border: 1px solid rgba(224, 170, 255, 0.2); border-radius: 20px; padding: 12px;
-            text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            background: var(--glass); border: 1px solid rgba(224, 170, 255, 0.2);
+            border-radius: 15px; padding: 8px; text-align: center;
         }
-        .wedding-title { font-family: 'Dancing Script', cursive; font-size: 1.2rem; color: var(--gold); margin-bottom: 8px; }
-        .timer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .timer-unit { background: rgba(0,0,0,0.4); padding: 8px 2px; border-radius: 12px; }
-        .unit-val { font-size: 1.1rem; font-weight: 600; }
-        .unit-label { font-size: 0.55rem; color: var(--accent); text-transform: uppercase; display: block; }
+        .wedding-title { font-family: 'Dancing Script', cursive; font-size: 1rem; color: var(--gold); margin-bottom: 5px; }
+        .timer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+        .timer-unit { background: rgba(0,0,0,0.3); padding: 5px 2px; border-radius: 8px; }
+        .unit-val { font-size: 14px; font-weight: 600; display: block; }
+        .unit-label { font-size: 8px; color: var(--accent); text-transform: uppercase; }
 
-        /* صندوق الرسالة المظلل */
+        /* صندوق القشط - يأخذ المساحة المتبقية بدقة */
         .scratch-outer { 
-            position: relative; width: 100%; max-width: 500px; flex-grow: 1; 
-            margin: 15px 0; background: #fff; border-radius: 25px; overflow: hidden; 
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5); max-height: 45vh;
+            position: relative; width: 100%; max-width: 400px; 
+            flex: 1; /* التمدد لملء الفراغ */
+            margin: 10px 0; background: #fff; border-radius: 20px; 
+            overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            min-height: 150px; /* الحد الأدنى لعدم الاختفاء */
         }
-        /* الرسالة تكون مخفية في البداية */
         .message-under { 
-            width: 100%; height: 100%; padding: 25px; color: #1a0033; 
+            width: 100%; height: 100%; padding: 15px; color: #1a0033; 
             display: flex; flex-direction: column; justify-content: center; 
-            align-items: center; text-align: center; background: white;
-            opacity: 0; transition: opacity 0.5s;
+            align-items: center; text-align: center; opacity: 0; transition: 0.5s;
         }
-        #daily-message { font-size: 1rem; font-weight: 600; color: #2e004e; margin-bottom: 10px; }
-        #daily-translation { font-family: 'Amiri', serif; font-size: 1.3rem; color: #5a189a; border-top: 1px dashed #ccc; padding-top: 10px; direction: rtl; }
+        #daily-message { font-size: 14px; font-weight: 600; color: #2e004e; margin-bottom: 8px; line-height: 1.3; }
+        #daily-translation { font-family: 'Amiri', serif; font-size: 18px; color: #5a189a; border-top: 1px dashed #ccc; padding-top: 8px; direction: rtl; }
         
         #scratch-canvas { position: absolute; inset: 0; z-index: 10; cursor: crosshair; touch-action: none; width: 100%; height: 100%; }
 
-        .nav-column { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 500px; padding-bottom: 10px; }
-        .nav-btn { background: var(--glass); border: 1px solid rgba(224, 170, 255, 0.2); color: white; padding: 15px; border-radius: 15px; font-size: 0.85rem; }
+        /* الأزرار في الأسفل */
+        .nav-column { 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px; 
+            width: 100%; max-width: 400px; margin-top: 5px;
+        }
+        .nav-btn { background: var(--glass); border: 1px solid rgba(224, 170, 255, 0.2); color: white; padding: 12px; border-radius: 12px; font-size: 12px; }
         #today-btn { grid-column: span 2; background: linear-gradient(45deg, #7b2cbf, #9d4edd); border: none; font-weight: 600; }
 
         .shining-text {
@@ -103,7 +117,7 @@
         <div class="heart-icon">💜</div>
         <div class="lock-box">
             <input type="password" id="pass-input" placeholder="Enter Secret Key" autocomplete="off">
-            <p id="error-msg" style="color:var(--error); font-size:0.75rem; margin-top:10px; display:none; font-weight: 600;">Wrong Key, My Queen! 💜</p>
+            <p id="error-msg" style="color:var(--error); font-size:11px; margin-top:8px; display:none;">Wrong Key, Try Again 💜</p>
         </div>
     </div>
 
@@ -120,7 +134,7 @@
             </div>
         </div>
 
-        <h2 id="daily-title" class="shining-text" style="font-family: 'Dancing Script'; font-size: 1.6rem;">Magic Message</h2>
+        <h2 id="daily-title" class="shining-text" style="font-family: 'Dancing Script'; font-size: 1.3rem;">Magic Message</h2>
         
         <div class="scratch-outer" id="scratch-box">
             <div class="message-under" id="msg-container">
@@ -158,18 +172,14 @@
                 const h = Math.floor((diff % 86400000) / 3600000);
                 const m = Math.floor((diff % 3600000) / 60000);
                 const s = Math.floor((diff % 60000) / 1000);
-                document.getElementById('since-counter').innerHTML = `The moment my life changed forever <b>${d}d ${h}h ${m}m ${s}s</b> 💜`;
+                document.getElementById('since-counter').innerHTML = `My Life Started: <b>${d}d ${h}h ${m}m ${s}s</b> 💜`;
             }, 1000);
         }
 
         function runWeddingTimer() {
             const weddingDate = new Date("2026-01-13T00:00:00");
-            const hideDate = new Date("2026-01-14T00:00:00");
             setInterval(() => {
-                const now = new Date();
-                if (now >= hideDate) { document.getElementById("wedding-box").style.display = "none"; return; }
-                document.getElementById("wedding-box").style.display = "block";
-                const diff = weddingDate.getTime() - now.getTime();
+                const diff = weddingDate.getTime() - new Date().getTime();
                 if (diff > 0) {
                     document.getElementById("w-days").innerText = Math.floor(diff / 86400000);
                     document.getElementById("w-hours").innerText = Math.floor((diff % 86400000) / 3600000);
@@ -187,15 +197,14 @@
             ctx.fillStyle = '#e0aaff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = "#5a189a";
-            ctx.font = "bold 16px Poppins";
+            ctx.font = "bold 14px Poppins";
             ctx.textAlign = "center";
             ctx.fillText("Scratch for Love 💜", canvas.width/2, canvas.height/2);
-            // بعد رسم التظليل، نظهر محتوى الرسالة (سيبقى مخفياً بصرياً تحت الكانفاس)
             document.getElementById('msg-container').style.opacity = "1";
         }
 
         async function loadData(dateObj) {
-            document.getElementById('msg-container').style.opacity = "0"; // إخفاء الرسالة قبل التحميل
+            document.getElementById('msg-container').style.opacity = "0";
             const dateStr = dateObj.toISOString().split('T')[0];
             const { data } = await _supabase.from('messages').select('*').eq('date', dateStr).single();
             if (data) {
@@ -203,22 +212,17 @@
                 document.getElementById('daily-message').innerText = data.message;
                 document.getElementById('daily-translation').innerText = data.translation;
                 if(dateStr === realTodayStr) { correctPass = String(data.password).trim(); }
-                setTimeout(setupCanvas, 100); // رسم التظليل فوراً
+                setTimeout(setupCanvas, 150);
             }
         }
 
         document.getElementById('pass-input').addEventListener('input', function() {
-            const val = this.value.trim();
-            if (val === correctPass) {
-                document.getElementById('lock-screen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('lock-screen').style.display = 'none';
-                    document.getElementById('main-content').style.display = 'flex';
-                    document.getElementById('since-counter').style.display = 'block';
-                    runSinceTimer(); runWeddingTimer();
-                    setupCanvas(); // تأكيد الرسم بعد فتح الشاشة
-                }, 400);
-            } else if (val.length >= correctPass.length && correctPass !== "") {
+            if (this.value.trim() === correctPass) {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('main-content').style.display = 'flex';
+                document.getElementById('since-counter').style.display = 'block';
+                runSinceTimer(); runWeddingTimer(); setupCanvas();
+            } else if (this.value.length >= correctPass.length && correctPass !== "") {
                 this.classList.add('shake');
                 document.getElementById('error-msg').style.display = 'block';
                 setTimeout(() => { this.classList.remove('shake'); this.value = ""; }, 400);
@@ -231,7 +235,7 @@
             const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
             const y = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
             ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath(); ctx.arc(x, y, 40, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x, y, 30, 0, Math.PI*2); ctx.fill();
         }
 
         canvas.addEventListener('mousedown', () => drawing = true);
