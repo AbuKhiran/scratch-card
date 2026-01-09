@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>For My Queen | Perfect View</title>
+    <title>For My Queen | Eternal Love</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&family=Amiri:ital,wght@1,700&display=swap" rel="stylesheet">
@@ -12,125 +12,118 @@
         :root { 
             --bg-color: #0d001a; 
             --accent: #e0aaff; 
-            --glass: rgba(255, 255, 255, 0.1);
+            --glass: rgba(255, 255, 255, 0.08);
+            --gold: #ffd700;
             --error: #ff4d4d;
         }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        html, body { height: 100vh; width: 100vw; overflow: hidden; background: var(--bg-color); font-family: 'Poppins', sans-serif; color: white; }
 
-        /* تجميد الصفحة لمنع السكرول */
-        html, body { 
-            height: 100%; width: 100%; overflow: hidden; 
-            background: var(--bg-color); font-family: 'Poppins', sans-serif; 
-            color: white; 
+        .background-particles { position: fixed; inset: 0; background: linear-gradient(135deg, #1a0033 0%, #0d001a 100%); z-index: -1; }
+
+        #since-counter {
+            position: fixed; top: 0; width: 100%; padding: 8px 5px;
+            font-size: clamp(0.7rem, 2vw, 0.85rem); color: var(--accent); text-align: center;
+            background: rgba(224, 170, 255, 0.1); border-bottom: 1px solid rgba(224, 170, 255, 0.2);
+            z-index: 150; display: none; backdrop-filter: blur(5px);
         }
 
-        body { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-
-        .background-particles {
-            position: fixed; inset: 0;
-            background: linear-gradient(135deg, #1a0033 0%, #0d001a 100%);
-            z-index: -1;
+        #lock-screen { 
+            position: fixed; inset: 0; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; z-index: 200; text-align: center;
+            background: var(--bg-color); transition: 0.5s;
         }
-
-        .particle {
-            position: absolute; background: rgba(224, 170, 255, 0.3);
-            border-radius: 50%; animation: moveParticles 15s infinite alternate linear;
-            filter: blur(1px); opacity: 0;
-        }
-
-        @keyframes moveParticles {
-            0% { transform: translate(0, 0) scale(0); opacity: 0; }
-            50% { opacity: 0.5; transform: translate(var(--x1), var(--y1)) scale(1); }
-            100% { transform: translate(var(--x2), var(--y2)) scale(0); opacity: 0; }
-        }
-
-        /* العداد العلوي */
-        #top-counter {
-            position: absolute; top: 0; width: 100%; padding: 15px;
-            font-size: clamp(0.7rem, 3vw, 0.9rem); color: var(--accent); 
-            text-align: center; z-index: 150; display: none;
-            background: linear-gradient(to bottom, rgba(13,0,26,0.9), transparent);
-        }
-
-        /* شاشة القفل - في المنتصف */
-        #lock-screen {
-            position: absolute; inset: 0; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 100;
-            padding: 20px; transition: 0.8s ease-in-out;
-        }
-
-        .heart-icon { 
-            font-size: clamp(60px, 15vw, 80px); color: #e0aaff; 
-            filter: drop-shadow(0 0 15px #e0aaff); animation: pulse 2s infinite; 
-        }
+        .main-welcome-title { font-family: 'Dancing Script', cursive; font-size: clamp(2.2rem, 8vw, 3.5rem); }
+        .heart-icon { font-size: 60px; filter: drop-shadow(0 0 15px #e0aaff); animation: pulse 2s infinite; margin: 20px 0; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
-        .lock-box { width: 100%; max-width: 300px; margin-top: 20px; }
         .lock-box input { 
-            width: 100%; padding: 15px; border-radius: 50px; 
+            width: 280px; padding: 15px; border-radius: 50px; 
             border: 2px solid var(--accent); background: var(--glass); 
-            color: white; text-align: center; font-size: 1.1rem; outline: none;
+            color: white; text-align: center; outline: none; font-size: 1rem;
         }
+        .shake { animation: shake 0.4s ease-in-out; border-color: var(--error) !important; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
 
-        /* المحتوى الرئيسي - يشغل كامل المساحة المتاحة */
         .main-content { 
-            display: none; width: 100%; max-width: 450px; height: 90vh;
-            flex-direction: column; justify-content: space-between; 
-            align-items: center; padding: 20px; z-index: 10;
+            display: none; width: 100%; height: 100vh; flex-direction: column; align-items: center; 
+            padding: 60px 20px 20px 20px; justify-content: space-between;
         }
 
-        .header-section { margin-top: 20px; }
-        h1 { font-family: 'Dancing Script', cursive; font-size: clamp(1.8rem, 6vw, 2.5rem); color: var(--accent); }
-
-        /* صندوق القشط المرن */
-        .scratch-outer {
-            position: relative; width: 100%; flex-grow: 1; max-height: 400px;
-            background: #fff; border-radius: 25px; overflow: hidden;
-            margin: 20px 0; box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+        #wedding-box { width: 100%; max-width: 500px; }
+        .wedding-container {
+            background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+            border: 1px solid rgba(224, 170, 255, 0.2); border-radius: 20px; padding: 12px;
+            text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.3);
         }
+        .wedding-title { font-family: 'Dancing Script', cursive; font-size: 1.2rem; color: var(--gold); margin-bottom: 8px; }
+        .timer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .timer-unit { background: rgba(0,0,0,0.4); padding: 8px 2px; border-radius: 12px; }
+        .unit-val { font-size: 1.1rem; font-weight: 600; }
+        .unit-label { font-size: 0.55rem; color: var(--accent); text-transform: uppercase; display: block; }
 
+        /* صندوق الرسالة المظلل */
+        .scratch-outer { 
+            position: relative; width: 100%; max-width: 500px; flex-grow: 1; 
+            margin: 15px 0; background: #fff; border-radius: 25px; overflow: hidden; 
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5); max-height: 45vh;
+        }
+        /* الرسالة تكون مخفية في البداية */
         .message-under { 
-            width: 100%; height: 100%; padding: 25px; color: #1a0033;
-            display: flex; flex-direction: column; justify-content: center; text-align: center;
+            width: 100%; height: 100%; padding: 25px; color: #1a0033; 
+            display: flex; flex-direction: column; justify-content: center; 
+            align-items: center; text-align: center; background: white;
+            opacity: 0; transition: opacity 0.5s;
         }
-        #daily-message { font-size: clamp(0.9rem, 4vw, 1.15rem); font-weight: 600; color: #2e004e; margin-bottom: 10px; }
-        #daily-translation { font-family: 'Amiri', serif; font-size: clamp(1.1rem, 5vw, 1.4rem); color: #5a189a; border-top: 1px dashed #ccc; padding-top: 10px; direction: rtl; }
+        #daily-message { font-size: 1rem; font-weight: 600; color: #2e004e; margin-bottom: 10px; }
+        #daily-translation { font-family: 'Amiri', serif; font-size: 1.3rem; color: #5a189a; border-top: 1px dashed #ccc; padding-top: 10px; direction: rtl; }
         
-        #scratch-canvas { position: absolute; inset: 0; touch-action: none; z-index: 10; width: 100%; height: 100%; }
+        #scratch-canvas { position: absolute; inset: 0; z-index: 10; cursor: crosshair; touch-action: none; width: 100%; height: 100%; }
 
-        /* الأزرار في الأسفل */
-        .nav-column { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-bottom: 10px; }
-        .nav-btn {
-            background: var(--glass); border: 1px solid rgba(224, 170, 255, 0.2); 
-            color: white; padding: 12px; border-radius: 15px; cursor: pointer; font-size: 0.85rem;
-        }
+        .nav-column { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 500px; padding-bottom: 10px; }
+        .nav-btn { background: var(--glass); border: 1px solid rgba(224, 170, 255, 0.2); color: white; padding: 15px; border-radius: 15px; font-size: 0.85rem; }
         #today-btn { grid-column: span 2; background: linear-gradient(45deg, #7b2cbf, #9d4edd); border: none; font-weight: 600; }
-        .nav-btn:disabled { opacity: 0.2; }
+
+        .shining-text {
+            background: linear-gradient(to right, #e0aaff 20%, #fff 50%, #e0aaff 80%);
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite;
+        }
+        @keyframes shine { to { background-position: 200% center; } }
     </style>
 </head>
 <body>
 
-    <div class="background-particles" id="particles-bg"></div>
-    <div id="top-counter">Counting...</div>
+    <div class="background-particles"></div>
+    <div id="since-counter">Loading...</div>
 
     <div id="lock-screen">
+        <h1 class="main-welcome-title shining-text">For My Queen</h1>
         <div class="heart-icon">💜</div>
         <div class="lock-box">
-            <h2 style="font-weight: 300; font-size: 0.8rem; margin-bottom: 1.5rem; letter-spacing: 2px; color: var(--accent);">MY Queen Private Space </h2>
-            <input type="password" id="pass-input" placeholder="Secret Key" autocomplete="off" disabled>
-            <div id="error-msg" style="color: var(--error); margin-top: 10px; font-size: 0.75rem; display: none;">Incorret key  , try again 😂</div>
+            <input type="password" id="pass-input" placeholder="Enter Secret Key" autocomplete="off">
+            <p id="error-msg" style="color:var(--error); font-size:0.75rem; margin-top:10px; display:none; font-weight: 600;">Wrong Key, My Queen! 💜</p>
         </div>
     </div>
 
     <div class="main-content" id="main-content">
-        <div class="header-section">
-            <p id="date-display" style="font-size: 0.8rem; color: var(--accent); opacity: 0.7;"></p>
-            <h1 id="daily-title">Our Daily Magic</h1>
+        <div id="wedding-box">
+            <div class="wedding-container">
+                <div class="wedding-title">💍 Our Big Day: 13.01.2026</div>
+                <div class="timer-grid">
+                    <div class="timer-unit"><span class="unit-val" id="w-days">00</span><span class="unit-label">Days</span></div>
+                    <div class="timer-unit"><span class="unit-val" id="w-hours">00</span><span class="unit-label">Hrs</span></div>
+                    <div class="timer-unit"><span class="unit-val" id="w-mins">00</span><span class="unit-label">Min</span></div>
+                    <div class="timer-unit"><span class="unit-val" id="w-secs">00</span><span class="unit-label">Sec</span></div>
+                </div>
+            </div>
         </div>
+
+        <h2 id="daily-title" class="shining-text" style="font-family: 'Dancing Script'; font-size: 1.6rem;">Magic Message</h2>
         
         <div class="scratch-outer" id="scratch-box">
-            <div class="message-under">
+            <div class="message-under" id="msg-container">
                 <span id="daily-message"></span>
                 <span id="daily-translation"></span>
             </div>
@@ -139,8 +132,8 @@
 
         <div class="nav-column">
             <button class="nav-btn" id="today-btn" onclick="goBackToToday()">Today's Mystery 💜</button>
-            <button class="nav-btn" id="prev-btn" onclick="changeDate(-1)">← Older</button>
-            <button class="nav-btn" id="next-btn" onclick="changeDate(1)">Newer →</button>
+            <button class="nav-btn" onclick="changeDate(-1)">← Older</button>
+            <button class="nav-btn" onclick="changeDate(1)">Newer →</button>
         </div>
     </div>
 
@@ -152,121 +145,85 @@
         let correctPass = "";
         let displayedDate = new Date();
         const realTodayStr = new Date().toISOString().split('T')[0];
-        let hasScratchedToday = false;
 
-        function getFingerprint() {
-            let qid = localStorage.getItem('_q_secure_id');
-            if (!qid) {
-                qid = 'QID-' + Math.random().toString(36).substring(2, 10).toUpperCase() + '-' + Date.now();
-                localStorage.setItem('_q_secure_id', qid);
-            }
-            return qid;
-        }
+        const canvas = document.getElementById('scratch-canvas');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
 
-        async function sendLog(type, details = "") {
-            try {
-                let userIp = "Hidden";
-                try {
-                    const ipRes = await fetch('https://api.ipify.org?format=json');
-                    const ipData = await ipRes.json();
-                    userIp = ipData.ip;
-                } catch (e) {}
-
-                await _supabase.from('access_logs').insert([{
-                    ip: userIp, device: /iPhone|Android/i.test(navigator.userAgent) ? "Mobile" : "PC",
-                    device_id: getFingerprint(), screen: `${window.innerWidth}x${window.innerHeight}`,
-                    type: type, browser: details || navigator.userAgent.substring(0, 50),
-                    access_date: realTodayStr, message_date: realTodayStr 
-                }]);
-            } catch (err) {}
-        }
-
-        function createParticles() {
-            const container = document.getElementById('particles-bg');
-            for (let i = 0; i < 20; i++) {
-                const p = document.createElement('div');
-                p.classList.add('particle');
-                p.style.width = p.style.height = `${Math.random() * 5 + 2}px`;
-                p.style.left = `${Math.random() * 100}%`; p.style.top = `${Math.random() * 100}%`;
-                p.style.setProperty('--x1', `${Math.random() * 200 - 100}px`);
-                p.style.setProperty('--y1', `${Math.random() * 200 - 100}px`);
-                p.style.setProperty('--x2', `${Math.random() * 400 - 200}px`);
-                p.style.setProperty('--y2', `${Math.random() * 400 - 200}px`);
-                p.style.animationDelay = `${Math.random() * -15}s`;
-                container.appendChild(p);
-            }
-        }
-
-        function startCounter() {
-            const start = new Date("2025-10-03T15:40:00").getTime();
+        function runSinceTimer() {
+            const start = new Date("2025-10-03T16:18:00").getTime();
             setInterval(() => {
                 const diff = new Date().getTime() - start;
                 const d = Math.floor(diff / 86400000);
                 const h = Math.floor((diff % 86400000) / 3600000);
                 const m = Math.floor((diff % 3600000) / 60000);
                 const s = Math.floor((diff % 60000) / 1000);
-                document.getElementById('top-counter').innerHTML = `<b>${d}d ${h}h ${m}m ${s}s</b> with you`;
+                document.getElementById('since-counter').innerHTML = `The moment my life changed forever <b>${d}d ${h}h ${m}m ${s}s</b> 💜`;
             }, 1000);
         }
 
-        async function loadData(dateObj) {
-            const dateStr = dateObj.toISOString().split('T')[0];
-            const isToday = (dateStr === realTodayStr);
-            document.getElementById('date-display').innerText = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-            document.getElementById('today-btn').style.display = isToday ? 'none' : 'block';
-            document.getElementById('next-btn').disabled = isToday;
+        function runWeddingTimer() {
+            const weddingDate = new Date("2026-01-13T00:00:00");
+            const hideDate = new Date("2026-01-14T00:00:00");
+            setInterval(() => {
+                const now = new Date();
+                if (now >= hideDate) { document.getElementById("wedding-box").style.display = "none"; return; }
+                document.getElementById("wedding-box").style.display = "block";
+                const diff = weddingDate.getTime() - now.getTime();
+                if (diff > 0) {
+                    document.getElementById("w-days").innerText = Math.floor(diff / 86400000);
+                    document.getElementById("w-hours").innerText = Math.floor((diff % 86400000) / 3600000);
+                    document.getElementById("w-mins").innerText = Math.floor((diff % 3600000) / 60000);
+                    document.getElementById("w-secs").innerText = Math.floor((diff % 60000) / 1000);
+                }
+            }, 1000);
+        }
 
+        function setupCanvas() {
+            const box = document.getElementById('scratch-box');
+            canvas.width = box.offsetWidth; 
+            canvas.height = box.offsetHeight;
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = '#e0aaff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#5a189a";
+            ctx.font = "bold 16px Poppins";
+            ctx.textAlign = "center";
+            ctx.fillText("Scratch for Love 💜", canvas.width/2, canvas.height/2);
+            // بعد رسم التظليل، نظهر محتوى الرسالة (سيبقى مخفياً بصرياً تحت الكانفاس)
+            document.getElementById('msg-container').style.opacity = "1";
+        }
+
+        async function loadData(dateObj) {
+            document.getElementById('msg-container').style.opacity = "0"; // إخفاء الرسالة قبل التحميل
+            const dateStr = dateObj.toISOString().split('T')[0];
             const { data } = await _supabase.from('messages').select('*').eq('date', dateStr).single();
             if (data) {
                 document.getElementById('daily-title').innerText = data.title;
                 document.getElementById('daily-message').innerText = data.message;
                 document.getElementById('daily-translation').innerText = data.translation;
-                if(isToday) {
-                    correctPass = String(data.password).trim();
-                    document.getElementById('pass-input').disabled = false;
-                    setupCanvas(!hasScratchedToday);
-                } else { setupCanvas(false); }
+                if(dateStr === realTodayStr) { correctPass = String(data.password).trim(); }
+                setTimeout(setupCanvas, 100); // رسم التظليل فوراً
             }
         }
 
-        async function checkPass() {
-            const input = document.getElementById('pass-input');
-            const val = input.value.trim();
+        document.getElementById('pass-input').addEventListener('input', function() {
+            const val = this.value.trim();
             if (val === correctPass) {
-                sendLog('Success');
-                document.getElementById('top-counter').style.display = 'block';
-                document.getElementById('lock-screen').style.transform = 'scale(0.8)';
                 document.getElementById('lock-screen').style.opacity = '0';
                 setTimeout(() => {
                     document.getElementById('lock-screen').style.display = 'none';
                     document.getElementById('main-content').style.display = 'flex';
-                    setupCanvas(true);
-                }, 600);
+                    document.getElementById('since-counter').style.display = 'block';
+                    runSinceTimer(); runWeddingTimer();
+                    setupCanvas(); // تأكيد الرسم بعد فتح الشاشة
+                }, 400);
             } else if (val.length >= correctPass.length && correctPass !== "") {
-                sendLog('Failed', val);
-                input.style.borderColor = 'var(--error)';
+                this.classList.add('shake');
                 document.getElementById('error-msg').style.display = 'block';
-                setTimeout(() => { input.style.borderColor = 'var(--accent)'; input.value = ''; }, 600);
+                setTimeout(() => { this.classList.remove('shake'); this.value = ""; }, 400);
             }
-        }
-
-        document.getElementById('pass-input').addEventListener('input', checkPass);
-        function changeDate(n) { displayedDate.setDate(displayedDate.getDate() + n); loadData(displayedDate); }
-        function goBackToToday() { displayedDate = new Date(); loadData(displayedDate); }
-
-        const canvas = document.getElementById('scratch-canvas');
-        const ctx = canvas.getContext('2d');
-        let drawing = false;
-
-        function setupCanvas(cover) {
-            const box = document.getElementById('scratch-box');
-            if(!box || !cover) { canvas.style.display = 'none'; return; }
-            canvas.style.display = 'block';
-            canvas.width = box.offsetWidth; canvas.height = box.offsetHeight;
-            ctx.fillStyle = '#e0aaff'; ctx.fillRect(0,0,canvas.width,canvas.height);
-            ctx.fillStyle = "white"; ctx.font = "bold 15px Poppins"; ctx.textAlign="center";
-            ctx.fillText("Unveil the Magic ✨", canvas.width/2, canvas.height/2);
-        }
+        });
 
         function scratch(e) {
             if (!drawing) return;
@@ -274,8 +231,7 @@
             const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
             const y = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
             ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath(); ctx.arc(x, y, 30, 0, Math.PI*2); ctx.fill();
-            hasScratchedToday = true;
+            ctx.beginPath(); ctx.arc(x, y, 40, 0, Math.PI*2); ctx.fill();
         }
 
         canvas.addEventListener('mousedown', () => drawing = true);
@@ -285,7 +241,11 @@
         canvas.addEventListener('mousemove', scratch);
         canvas.addEventListener('touchmove', (e) => { scratch(e); e.preventDefault(); }, {passive: false});
 
-        createParticles(); startCounter(); loadData(new Date());
+        function changeDate(n) { displayedDate.setDate(displayedDate.getDate() + n); loadData(displayedDate); }
+        function goBackToToday() { displayedDate = new Date(); loadData(displayedDate); }
+
+        loadData(new Date());
+        window.addEventListener('resize', setupCanvas);
     </script>
 </body>
 </html>
