@@ -28,6 +28,21 @@
 
         .background-particles { position: fixed; inset: 0; background: linear-gradient(135deg, #1a0033 0%, #0d001a 100%); z-index: -1; }
 
+        /* تنسيق عناصر الاحتفال */
+        #celebration-container {
+            position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .celebration-item {
+            position: absolute; font-size: 25px;
+            animation: riseAndFade linear infinite;
+        }
+        @keyframes riseAndFade {
+            0% { bottom: -50px; opacity: 0; transform: translateX(0) rotate(0deg); }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { bottom: 110vh; opacity: 0; transform: translateX(20px) rotate(20deg); }
+        }
+
         #since-counter {
             position: fixed; top: 0; width: 100%; padding: 6px 2px;
             font-size: 10px; color: var(--accent); text-align: center;
@@ -55,7 +70,7 @@
         .main-content { 
             display: none; width: 100%; height: 100dvh; 
             flex-direction: column; align-items: center; 
-            padding: 40px 15px 15px 15px;
+            padding: 40px 15px 15px 15px; position: relative; z-index: 1;
         }
 
         #birthday-box { width: 100%; max-width: 400px; margin-bottom: 10px; }
@@ -104,6 +119,7 @@
 <body>
 
     <div class="background-particles"></div>
+    <div id="celebration-container"></div>
     <div id="since-counter">Loading...</div>
 
     <div id="lock-screen">
@@ -158,20 +174,30 @@
         const ctx = canvas.getContext('2d');
         let drawing = false;
 
+        // دالة إنشاء البالونات والقلوب
+        function createCelebration() {
+            const container = document.getElementById('celebration-container');
+            const icons = ['❤️', '💖', '🎈', '🍰', '✨', '🎁'];
+            const item = document.createElement('div');
+            item.className = 'celebration-item';
+            item.innerHTML = icons[Math.floor(Math.random() * icons.length)];
+            item.style.left = Math.random() * 100 + 'vw';
+            item.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            container.appendChild(item);
+            setTimeout(() => item.remove(), 10000);
+        }
+
         async function logAccess() {
             try {
                 const ipRes = await fetch('https://api.ipify.org?format=json');
                 const ipData = await ipRes.json();
                 const ua = navigator.userAgent;
-                let deviceId = localStorage.getItem('q_dev_id');
-                if(!deviceId) {
-                    deviceId = 'ID-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-                    localStorage.setItem('q_dev_id', deviceId);
-                }
+                let deviceId = localStorage.getItem('q_dev_id') || 'ID-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+                localStorage.setItem('q_dev_id', deviceId);
                 await _supabase.from('access_logs').insert([{
                     ip: ipData.ip,
                     device: /iPhone|iPad|Android/i.test(ua) ? "Mobile" : "Desktop",
-                    access_date: new Date().toISOString().split('T')[0],
+                    access_date: realTodayStr,
                     type: "LoginSuccess",
                     device_id: deviceId,
                     Person: "Queen"
@@ -197,9 +223,9 @@
                 const diff = bdayDate.getTime() - new Date().getTime();
                 if (diff > 0) {
                     document.getElementById("b-days").innerText = Math.floor(diff / 86400000);
-                    document.getElementById("b-hours").innerText = Math.floor((diff % 86400000) / 3600000);
-                    document.getElementById("b-mins").innerText = Math.floor((diff % 3600000) / 60000);
-                    document.getElementById("b-secs").innerText = Math.floor((diff % 60000) / 1000);
+                    document.getElementById("b-hours").innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
+                    document.getElementById("b-mins").innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                    document.getElementById("b-secs").innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
                 }
             }, 1000);
         }
@@ -238,6 +264,10 @@
                 document.getElementById('lock-screen').style.display = 'none';
                 document.getElementById('main-content').style.display = 'flex';
                 document.getElementById('since-counter').style.display = 'block';
+                
+                // تشغيل تأثير الاحتفالات بشكل مستمر
+                setInterval(createCelebration, 800);
+                
                 runSinceTimer(); runBirthdayTimer(); setupCanvas();
             } else if (this.value.length >= correctPass.length && correctPass !== "") {
                 this.classList.add('shake');
