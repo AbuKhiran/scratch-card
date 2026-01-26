@@ -58,12 +58,12 @@
             padding: 40px 15px 15px 15px;
         }
 
-        #wedding-box { width: 100%; max-width: 400px; margin-bottom: 10px; }
-        .wedding-container {
+        #birthday-box { width: 100%; max-width: 400px; margin-bottom: 10px; }
+        .birthday-container {
             background: var(--glass); border: 1px solid rgba(224, 170, 255, 0.2);
             border-radius: 15px; padding: 8px; text-align: center;
         }
-        .wedding-title { font-family: 'Dancing Script', cursive; font-size: 1rem; color: var(--gold); margin-bottom: 5px; }
+        .birthday-title { font-family: 'Dancing Script', cursive; font-size: 1rem; color: var(--gold); margin-bottom: 5px; }
         .timer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
         .timer-unit { background: rgba(0,0,0,0.3); padding: 5px 2px; border-radius: 8px; }
         .unit-val { font-size: 14px; font-weight: 600; display: block; }
@@ -116,14 +116,14 @@
     </div>
 
     <div class="main-content" id="main-content">
-        <div id="wedding-box">
-            <div class="wedding-container">
-                <div class="wedding-title">💍 Our Big Day: 13.01.2026</div>
+        <div id="birthday-box">
+            <div class="birthday-container">
+                <div class="birthday-title">🎂 Queen's Birthday: 27.01.2026</div>
                 <div class="timer-grid">
-                    <div class="timer-unit"><span class="unit-val" id="w-days">00</span><span class="unit-label">Days</span></div>
-                    <div class="timer-unit"><span class="unit-val" id="w-hours">00</span><span class="unit-label">Hrs</span></div>
-                    <div class="timer-unit"><span class="unit-val" id="w-mins">00</span><span class="unit-label">Min</span></div>
-                    <div class="timer-unit"><span class="unit-val" id="w-secs">00</span><span class="unit-label">Sec</span></div>
+                    <div class="timer-unit"><span class="unit-val" id="b-days">00</span><span class="unit-label">Days</span></div>
+                    <div class="timer-unit"><span class="unit-val" id="b-hours">00</span><span class="unit-label">Hrs</span></div>
+                    <div class="timer-unit"><span class="unit-val" id="b-mins">00</span><span class="unit-label">Min</span></div>
+                    <div class="timer-unit"><span class="unit-val" id="b-secs">00</span><span class="unit-label">Sec</span></div>
                 </div>
             </div>
         </div>
@@ -158,35 +158,20 @@
         const ctx = canvas.getContext('2d');
         let drawing = false;
 
-        // --- وظيفة جلب المعرف والـ IP وتسجيل الدخول ---
         async function logAccess() {
             try {
-                // 1. جلب الـ IP
                 const ipRes = await fetch('https://api.ipify.org?format=json');
                 const ipData = await ipRes.json();
-                
-                // 2. تحليل المتصفح والجهاز
                 const ua = navigator.userAgent;
-                let browser = "Other";
-                if(ua.includes("Chrome")) browser = "Chrome";
-                else if(ua.includes("Safari") && !ua.includes("Chrome")) browser = "Safari";
-                else if(ua.includes("Firefox")) browser = "Firefox";
-
-                // 3. بصمة الجهاز الثابتة
                 let deviceId = localStorage.getItem('q_dev_id');
                 if(!deviceId) {
                     deviceId = 'ID-' + Math.random().toString(36).substr(2, 9).toUpperCase();
                     localStorage.setItem('q_dev_id', deviceId);
                 }
-
-                // 4. الإرسال لجدول access_logs
                 await _supabase.from('access_logs').insert([{
                     ip: ipData.ip,
                     device: /iPhone|iPad|Android/i.test(ua) ? "Mobile" : "Desktop",
-                    browser: browser,
-                    screen: `${window.innerWidth}x${window.innerHeight}`,
                     access_date: new Date().toISOString().split('T')[0],
-                    message_date: displayedDate.toISOString().split('T')[0],
                     type: "LoginSuccess",
                     device_id: deviceId,
                     Person: "Queen"
@@ -206,15 +191,15 @@
             }, 1000);
         }
 
-        function runWeddingTimer() {
-            const weddingDate = new Date("2026-01-13T00:00:00");
+        function runBirthdayTimer() {
+            const bdayDate = new Date("2026-01-27T00:00:00");
             setInterval(() => {
-                const diff = weddingDate.getTime() - new Date().getTime();
+                const diff = bdayDate.getTime() - new Date().getTime();
                 if (diff > 0) {
-                    document.getElementById("w-days").innerText = Math.floor(diff / 86400000);
-                    document.getElementById("w-hours").innerText = Math.floor((diff % 86400000) / 3600000);
-                    document.getElementById("w-mins").innerText = Math.floor((diff % 3600000) / 60000);
-                    document.getElementById("w-secs").innerText = Math.floor((diff % 60000) / 1000);
+                    document.getElementById("b-days").innerText = Math.floor(diff / 86400000);
+                    document.getElementById("b-hours").innerText = Math.floor((diff % 86400000) / 3600000);
+                    document.getElementById("b-mins").innerText = Math.floor((diff % 3600000) / 60000);
+                    document.getElementById("b-secs").innerText = Math.floor((diff % 60000) / 1000);
                 }
             }, 1000);
         }
@@ -249,11 +234,11 @@
 
         document.getElementById('pass-input').addEventListener('input', function() {
             if (this.value.trim() === correctPass) {
-                logAccess(); // تنفيذ السجل
+                logAccess();
                 document.getElementById('lock-screen').style.display = 'none';
                 document.getElementById('main-content').style.display = 'flex';
                 document.getElementById('since-counter').style.display = 'block';
-                runSinceTimer(); runWeddingTimer(); setupCanvas();
+                runSinceTimer(); runBirthdayTimer(); setupCanvas();
             } else if (this.value.length >= correctPass.length && correctPass !== "") {
                 this.classList.add('shake');
                 document.getElementById('error-msg').style.display = 'block';
