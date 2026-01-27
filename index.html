@@ -20,22 +20,27 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         html, body { 
             height: 100%; width: 100%; 
-            overflow: hidden; 
             background: var(--bg-color); 
             font-family: 'Poppins', sans-serif; 
             color: white; 
+            transition: background 0.5s ease;
         }
+
+        /* --- لوحة التحكم الجمالية (إضافة) --- */
+        #settings-trigger { position: fixed; top: 50px; right: 20px; z-index: 160; cursor: pointer; font-size: 22px; display: none; }
+        .settings-panel {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9);
+            width: 280px; background: rgba(13, 0, 26, 0.98); backdrop-filter: blur(15px);
+            border: 1px solid var(--accent); border-radius: 20px; padding: 20px;
+            z-index: 300; display: none; opacity: 0; transition: 0.3s; text-align: center;
+        }
+        .settings-panel.active { display: block; opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        .dot { width: 25px; height: 25px; border-radius: 50%; cursor: pointer; border: 2px solid white; display: inline-block; margin: 0 5px; }
 
         .background-particles { position: fixed; inset: 0; background: linear-gradient(135deg, #1a0033 0%, #0d001a 100%); z-index: -1; }
 
-        /* تنسيق عناصر الاحتفال */
-        #celebration-container {
-            position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
-        }
-        .celebration-item {
-            position: absolute; font-size: 25px;
-            animation: riseAndFade linear infinite;
-        }
+        #celebration-container { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .celebration-item { position: absolute; font-size: 25px; animation: riseAndFade linear infinite; }
         @keyframes riseAndFade {
             0% { bottom: -50px; opacity: 0; transform: translateX(0) rotate(0deg); }
             10% { opacity: 1; }
@@ -71,6 +76,7 @@
             display: none; width: 100%; height: 100dvh; 
             flex-direction: column; align-items: center; 
             padding: 40px 15px 15px 15px; position: relative; z-index: 1;
+            overflow-y: auto; /* للسماح بالتمرير إذا زاد المحتوى */
         }
 
         #birthday-box { width: 100%; max-width: 400px; margin-bottom: 10px; }
@@ -86,13 +92,12 @@
 
         .scratch-outer { 
             position: relative; width: 100%; max-width: 400px; 
-            flex: 1; 
             margin: 10px 0; background: #fff; border-radius: 20px; 
             overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            min-height: 150px;
+            min-height: 150px; height: auto; /* جعل الارتفاع مرن للرسائل الطويلة */
         }
         .message-under { 
-            width: 100%; height: 100%; padding: 15px; color: #1a0033; 
+            width: 100%; height: 100%; padding: 25px; color: #1a0033; 
             display: flex; flex-direction: column; justify-content: center; 
             align-items: center; text-align: center; opacity: 0; transition: 0.5s;
         }
@@ -101,12 +106,25 @@
         
         #scratch-canvas { position: absolute; inset: 0; z-index: 10; cursor: crosshair; touch-action: none; width: 100%; height: 100%; }
 
+        /* --- نظام التعليقات (إضافة) --- */
+        #queen-reply-display {
+            width: 100%; max-width: 380px; margin: 5px 0 15px 0;
+            background: rgba(224, 170, 255, 0.1); border-left: 4px solid var(--accent);
+            padding: 10px 15px; border-radius: 0 15px 15px 15px; display: none;
+        }
+        #journal-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            z-index: 400; display: none; justify-content: center; align-items: center; padding: 20px;
+        }
+        .journal-card { background: #1a0033; border: 1px solid var(--accent); width: 100%; max-width: 320px; border-radius: 20px; padding: 20px; text-align: center; }
+
         .nav-column { 
             display: grid; grid-template-columns: 1fr 1fr; gap: 8px; 
             width: 100%; max-width: 400px; margin-top: 5px;
         }
-        .nav-btn { background: var(--glass); border: 1px solid rgba(224, 170, 255, 0.2); color: white; padding: 12px; border-radius: 12px; font-size: 12px; }
+        .nav-btn { background: var(--glass); border: 1px solid rgba(224, 170, 255, 0.2); color: white; padding: 12px; border-radius: 12px; font-size: 12px; cursor: pointer; }
         #today-btn { grid-column: span 2; background: linear-gradient(45deg, #7b2cbf, #9d4edd); border: none; font-weight: 600; }
+        #comment-trigger-btn { grid-column: span 2; background: none; border: 1px dashed var(--accent); color: var(--accent); margin-top: 5px; }
 
         .shining-text {
             background: linear-gradient(to right, #e0aaff 20%, #fff 50%, #e0aaff 80%);
@@ -121,6 +139,27 @@
     <div class="background-particles"></div>
     <div id="celebration-container"></div>
     <div id="since-counter">Loading...</div>
+
+    <div id="settings-trigger" onclick="toggleSettings()">🎨</div>
+    <div id="settings-panel" class="settings-panel">
+        <h3 style="font-family:'Dancing Script'; color:var(--accent); margin-bottom:15px; font-size:1.5rem;">Aesthetic Palette</h3>
+        <div class="dot" style="background:#e0aaff" onclick="updateTheme('#e0aaff', '#0d001a')"></div>
+        <div class="dot" style="background:#ffadad" onclick="updateTheme('#ffadad', '#1a0000')"></div>
+        <div class="dot" style="background:#9bf6ff" onclick="updateTheme('#9bf6ff', '#000d1a')"></div>
+        <div class="dot" style="background:#ffd700" onclick="updateTheme('#ffd700', '#1a1400')"></div>
+        <br><br>
+        <button onclick="toggleSettings()" style="background:var(--accent); border:none; padding:8px 20px; border-radius:10px; width:100%; cursor:pointer;">Close</button>
+    </div>
+
+    <div id="journal-modal">
+        <div class="journal-card">
+            <h3 style="font-family:'Dancing Script'; color:var(--accent); margin-bottom:15px; font-size:1.4rem;">Whisper to Me</h3>
+            <textarea id="comment-input" placeholder="Your sweet note about today..." 
+                style="width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--accent); border-radius:12px; color:white; padding:12px; font-size:13px; outline:none; resize:none;" rows="4"></textarea>
+            <button onclick="saveComment()" style="width:100%; margin-top:15px; background:var(--accent); border:none; padding:10px; border-radius:10px; font-weight:600; cursor:pointer;">Save Note 💜</button>
+            <p onclick="toggleJournal()" style="margin-top:10px; font-size:11px; color:#aaa; cursor:pointer;">Cancel</p>
+        </div>
+    </div>
 
     <div id="lock-screen">
         <h1 class="main-welcome-title shining-text">For My Queen</h1>
@@ -154,10 +193,16 @@
             <canvas id="scratch-canvas"></canvas>
         </div>
 
+        <div id="queen-reply-display">
+            <small style="color:var(--accent); font-size:9px; text-transform:uppercase;">Nourti Whisper:</small>
+            <div id="reply-content" style="font-family:'Dancing Script'; font-size:1.2rem; color:#fff; line-height:1.2;"></div>
+        </div>
+
         <div class="nav-column">
             <button class="nav-btn" id="today-btn" onclick="goBackToToday()">Today's Mystery 💜</button>
             <button class="nav-btn" onclick="changeDate(-1)">← Older</button>
             <button class="nav-btn" onclick="changeDate(1)">Newer →</button>
+            <button class="nav-btn" id="comment-trigger-btn" onclick="toggleJournal()">💌 Write a Whisper</button>
         </div>
     </div>
 
@@ -174,7 +219,36 @@
         const ctx = canvas.getContext('2d');
         let drawing = false;
 
-        // دالة إنشاء البالونات والقلوب
+        // --- وظائف اللوحة والتعليقات ---
+        function toggleSettings() { document.getElementById('settings-panel').classList.toggle('active'); }
+        function toggleJournal() { 
+            const m = document.getElementById('journal-modal');
+            m.style.display = m.style.display === 'flex' ? 'none' : 'flex'; 
+        }
+        function updateTheme(accent, bg) { 
+            document.documentElement.style.setProperty('--accent', accent); 
+            document.documentElement.style.setProperty('--bg-color', bg); 
+        }
+
+        async function loadComment(dateStr) {
+            const display = document.getElementById('queen-reply-display');
+            const content = document.getElementById('reply-content');
+            const { data } = await _supabase.from('comments').select('content').eq('date', dateStr).single();
+            if (data && data.content) {
+                display.style.display = 'block';
+                content.innerText = data.content;
+            } else { display.style.display = 'none'; }
+        }
+
+        async function saveComment() {
+            const dateStr = displayedDate.toISOString().split('T')[0];
+            const content = document.getElementById('comment-input').value.trim();
+            if (!content) return;
+            const { error } = await _supabase.from('comments').upsert({ date: dateStr, content: content }, { onConflict: 'date' });
+            if (!error) { toggleJournal(); loadComment(dateStr); }
+        }
+
+        // --- دوال الكود الأصلي ---
         function createCelebration() {
             const container = document.getElementById('celebration-container');
             const icons = ['❤️', '💖', '✨', '🎂', '🎉', '🎈', '🌹', '👑', '💎', '🥳'];
@@ -256,6 +330,7 @@
                 if(dateStr === realTodayStr) { correctPass = String(data.password).trim(); }
                 setTimeout(setupCanvas, 150);
             }
+            loadComment(dateStr); // تحميل التعليق لهذا التاريخ
         }
 
         document.getElementById('pass-input').addEventListener('input', function() {
@@ -264,10 +339,8 @@
                 document.getElementById('lock-screen').style.display = 'none';
                 document.getElementById('main-content').style.display = 'flex';
                 document.getElementById('since-counter').style.display = 'block';
-                
-                // تشغيل تأثير الاحتفالات بشكل مستمر
+                document.getElementById('settings-trigger').style.display = 'block';
                 setInterval(createCelebration, 800);
-                
                 runSinceTimer(); runBirthdayTimer(); setupCanvas();
             } else if (this.value.length >= correctPass.length && correctPass !== "") {
                 this.classList.add('shake');
