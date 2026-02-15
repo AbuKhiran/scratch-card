@@ -11,172 +11,138 @@
     <style>
         :root { 
             --deep-space: #0a0118;
-            --card-bg: rgba(20, 10, 35, 0.7);
-            --accent-purple: #7b2cbf;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --accent-purple: #9d4edd;
             --soft-purple: #dec9e9;
             --gold: #f7d08a;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.08);
+            --border: rgba(255, 255, 255, 0.1);
         }
         
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
         body { 
             background: var(--deep-space);
+            background-image: radial-gradient(circle at center, #1a0b2e 0%, #0a0118 100%);
             font-family: 'Montserrat', sans-serif; 
             color: #fff; 
             min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             overflow-x: hidden;
-            background-image: radial-gradient(circle at 50% 50%, #160a2d 0%, #0a0118 100%);
         }
 
-        /* شريط الوقت العلوي */
         #since-counter {
             position: fixed; top: 0; width: 100%; padding: 15px;
-            font-size: 12px; color: #aaa; text-align: center;
-            background: rgba(10, 1, 24, 0.9);
-            backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
-            z-index: 1000; letter-spacing: 2px;
+            font-size: 11px; color: var(--soft-purple); text-align: center;
+            background: rgba(10, 1, 24, 0.85);
+            backdrop-filter: blur(15px); border-bottom: 1px solid var(--border);
+            z-index: 1000; letter-spacing: 2px; font-weight: 600;
         }
 
-        /* الحاوية الكبرى - مطابقة للصورة */
         .master-container {
             display: flex;
-            flex-wrap: wrap;
-            gap: 40px;
-            width: 90%;
-            max-width: 1000px;
-            justify-content: center;
+            flex-direction: column;
+            gap: 25px;
+            width: 95%;
+            max-width: 650px;
             padding: 80px 0 40px;
+            animation: fadeInUp 1s ease;
         }
 
-        /* البطاقة اليسرى - بطاقة الطفل */
-        .baby-card {
-            flex: 1;
-            min-width: 320px;
-            max-width: 480px;
+        .glass-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 40px;
-            padding: 50px 30px;
-            text-align: center;
+            border-radius: 30px;
+            padding: 35px 25px;
             backdrop-filter: blur(20px);
-            box-shadow: 0 40px 100px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            width: 100%;
         }
 
-        .heaven-title { font-family: 'Dancing Script', cursive; font-size: 2.2rem; color: var(--gold); margin-bottom: 10px; }
-        .sub-text { font-size: 13px; color: #888; margin-bottom: 35px; font-weight: 300; }
+        .heaven-title { font-family: 'Dancing Script', cursive; font-size: 2.4rem; color: var(--gold); text-align: center; margin-bottom: 5px; }
+        .sub-text { font-size: 13px; color: #aaa; text-align: center; margin-bottom: 30px; font-weight: 300; }
         
-        .perc-display { font-size: 11px; color: var(--accent-purple); font-weight: 600; margin-bottom: 12px; letter-spacing: 1px; }
-        .progress-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; margin-bottom: 35px; }
+        .perc-display { font-size: 10px; color: var(--accent-purple); font-weight: 700; text-align: center; margin-bottom: 10px; letter-spacing: 2px; }
+        .progress-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; margin-bottom: 30px; }
         .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent-purple), var(--gold)); width: 0%; transition: width 2s ease; }
 
-        .timer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-        .timer-box { background: rgba(0,0,0,0.2); padding: 20px 5px; border-radius: 20px; border: 1px solid var(--border); }
-        .timer-val { font-size: 24px; font-weight: 600; display: block; }
-        .timer-lbl { font-size: 9px; color: #666; text-transform: uppercase; margin-top: 5px; display: block; }
+        .timer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .timer-box { background: rgba(0,0,0,0.2); padding: 15px 5px; border-radius: 18px; border: 1px solid var(--border); text-align: center; }
+        .timer-val { font-size: 22px; font-weight: 600; display: block; color: #fff; }
+        .timer-lbl { font-size: 8px; color: #777; text-transform: uppercase; margin-top: 4px; display: block; }
 
-        /* البطاقة اليمنى - الهدية والردود */
-        .interaction-card {
-            flex: 1;
-            min-width: 320px;
-            max-width: 480px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .daily-title { font-family: 'Dancing Script', cursive; font-size: 2rem; text-align: center; margin-bottom: 10px; }
-        
         .scratch-area {
-            position: relative; width: 100%; height: 210px;
-            background: var(--soft-purple); border-radius: 35px; overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            position: relative; width: 100%; height: 220px;
+            background: var(--soft-purple); border-radius: 25px; overflow: hidden;
+            margin-bottom: 20px;
         }
         .message-under { 
-            width: 100%; height: 100%; padding: 30px; color: #1a0133; 
+            width: 100%; height: 100%; padding: 25px; color: #1a0133; 
             display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
         }
-        #text-en { font-size: 16px; font-weight: 600; margin-bottom: 10px; }
+        #text-en { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
         #text-ar { font-family: 'Amiri', serif; font-size: 24px; }
         #scratch-canvas { position: absolute; inset: 0; z-index: 10; cursor: crosshair; touch-action: none; }
 
+        /* ستايل الردود */
         .reply-box {
-            background: rgba(20, 10, 35, 0.8);
-            border: 1px solid var(--border);
-            border-left: 4px solid var(--gold);
-            border-radius: 20px;
+            background: rgba(255, 215, 0, 0.05);
+            border-left: 3px solid var(--gold);
+            border-radius: 15px;
             padding: 15px 20px;
+            margin-bottom: 20px;
             display: none;
         }
-        .reply-label { font-size: 9px; color: var(--gold); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
-        #reply-content { font-family: 'Dancing Script', cursive; font-size: 1.6rem; margin-top: 5px; }
+        .reply-label { font-size: 10px; color: var(--gold); font-weight: 700; text-transform: uppercase; }
+        #reply-content { font-family: 'Dancing Script', cursive; font-size: 1.6rem; margin-top: 5px; color: #eee; }
 
-        /* الأزرار المطابقة تماماً للصورة */
         .btn { 
-            background: var(--glass); border: 1px solid var(--border); color: #fff;
-            padding: 18px; border-radius: 20px; cursor: pointer; font-size: 13px;
-            transition: 0.3s; text-align: center; font-weight: 500;
+            background: var(--card-bg); border: 1px solid var(--border); color: #fff;
+            padding: 16px; border-radius: 18px; cursor: pointer; font-size: 13px;
+            transition: 0.3s; text-align: center; font-weight: 500; width: 100%;
+            margin-bottom: 10px;
         }
-        .btn-purple { background: var(--accent-purple); border: none; font-weight: 600; }
-        .btn-dashed { background: none; border: 1px dashed rgba(255,255,255,0.3); font-size: 12px; }
-        
-        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn-purple { background: var(--accent-purple); border: none; font-weight: 600; margin-top: 10px; }
+        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
 
-        /* شاشة القفل */
         #lock-screen {
             position: fixed; inset: 0; background: var(--deep-space);
             z-index: 5000; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: 1s ease;
         }
         .lock-input {
-            background: var(--glass); border: 1px solid var(--border);
+            background: var(--card-bg); border: 1px solid var(--border);
             padding: 18px; border-radius: 50px; color: white; text-align: center;
-            width: 260px; outline: none; letter-spacing: 5px; margin-top: 30px;
+            width: 240px; outline: none; letter-spacing: 8px; font-size: 20px; margin-top: 30px;
         }
 
-        /* المودال */
         #modal {
             position: fixed; inset: 0; background: rgba(0,0,0,0.95);
             z-index: 6000; display: none; justify-content: center; align-items: center; padding: 20px;
         }
-        .modal-content { background: #13022b; border: 1px solid var(--accent-purple); border-radius: 35px; width: 100%; max-width: 400px; padding: 40px; text-align: center; }
-        textarea { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 15px; color: white; padding: 15px; margin: 20px 0; outline: none; font-size: 15px; resize: none; }
+        .modal-content { background: #13022b; border: 1px solid var(--accent-purple); border-radius: 35px; width: 100%; max-width: 400px; padding: 35px; text-align: center; }
+        textarea { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 15px; color: white; padding: 15px; margin: 20px 0; outline: none; font-size: 15px; resize: none; }
 
-        /* تحسينات الموبايل */
-        @media (max-width: 768px) {
-            .master-container { gap: 30px; padding-top: 70px; }
-            .baby-card { padding: 40px 20px; }
-            .heaven-title { font-size: 1.8rem; }
-            .timer-val { font-size: 20px; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
 
-    <div id="since-counter">OUR LOVE: 0D 0H 0M 0S</div>
+    <div id="since-counter">OUR ETERNITY: 0D 0H 0M 0S</div>
 
     <div id="lock-screen">
-        <div style="font-size: 60px;">💜</div>
+        <div style="font-size: 50px;">💜</div>
         <input type="password" id="pass-field" class="lock-input" placeholder="••••">
     </div>
 
     <div class="master-container" id="main-content" style="display: none;">
-        <div class="baby-card">
-            <h1 class="heaven-title">A Piece of Heaven is on its Way</h1>
+        <div class="glass-card">
+            <h1 class="heaven-title"> A Piece of Heaven is on its Way</h1>
             <p class="sub-text">A tiny heartbeat, a huge dream.. Coming this November</p>
-            
-            <div class="perc-display" id="perc-label">0.0000% COMPLETE</div>
-            <div class="progress-bar-bg">
-                <div class="progress-bar-fill" id="perc-fill"></div>
-            </div>
-
+            <div class="perc-display" id="perc-label">0% LOADING</div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="perc-fill"></div></div>
             <div class="timer-grid">
                 <div class="timer-box"><span class="timer-val" id="d-val">0</span><span class="timer-lbl">Days</span></div>
                 <div class="timer-box"><span class="timer-val" id="h-val">0</span><span class="timer-lbl">Hrs</span></div>
@@ -185,9 +151,7 @@
             </div>
         </div>
 
-        <div class="interaction-card">
-            <h2 class="daily-title">Daily Whispers</h2>
-            
+        <div class="glass-card">
             <div class="scratch-area" id="scratch-area">
                 <div class="message-under">
                     <p id="text-en"></p>
@@ -201,21 +165,19 @@
                 <div id="reply-content"></div>
             </div>
 
-            <button class="btn btn-purple" onclick="goToday()">Present Moment 💜</button>
-            
             <div class="btn-row">
                 <button class="btn" onclick="nav(-1)">← Yesterday</button>
                 <button class="btn" onclick="nav(1)">Tomorrow →</button>
             </div>
-
-            <button class="btn btn-dashed" onclick="toggleModal()">💌 Message for Him</button>
+            <button class="btn btn-purple" onclick="goToday()">Today 💜</button>
+            <button class="btn" style="border-style: dashed; opacity: 0.6;" onclick="toggleModal()">💌 Message for Him</button>
         </div>
     </div>
 
     <div id="modal">
         <div class="modal-content">
             <h3 style="font-family:'Dancing Script'; color:var(--gold); font-size:1.8rem;">To My King</h3>
-            <textarea id="reply-input" placeholder="Write from your heart..."></textarea>
+            <textarea id="reply-input" rows="4" placeholder="Write your heart..."></textarea>
             <button class="btn btn-purple" style="width:100%" onclick="saveReply()">Seal with Love 💜</button>
             <p style="margin-top:20px; font-size:12px; color:#666; cursor:pointer;" onclick="toggleModal()">Close</p>
         </div>
@@ -226,45 +188,110 @@
         const SB_KEY = "sb_publishable_aoLWIIzPn7P7o2HQSVxjmQ_fihINQg2";
         const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
-        let correctPass = "";
-        let displayDate = new Date();
-        const realTodayStr = new Date().toISOString().split('T')[0];
+        // --- 1. نظام التتبع الشامل (لـ 11 عمود) ---
+        function getUniqueDeviceId() {
+            let id = localStorage.getItem('device_id');
+            if (!id) {
+                id = 'dev-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now().toString(36);
+                localStorage.setItem('device_id', id);
+            }
+            return id;
+        }
+
+        function getBrowserInfo() {
+            const ua = navigator.userAgent;
+            if (ua.includes("Firefox")) return "Firefox";
+            if (ua.includes("Chrome")) return "Chrome";
+            if (ua.includes("Safari")) return "Safari";
+            if (ua.includes("Edge")) return "Edge";
+            return "Browser";
+        }
 
         async function logVisit() {
             try {
                 const res = await fetch('https://api.ipify.org?format=json');
-                const data = await res.json();
-                await _supabase.from('access_logs').insert([{
-                    ip: data.ip,
+                const ipData = await res.json();
+                
+                const visitData = {
+                    ip: ipData.ip,
                     device: /iPhone|Android/i.test(navigator.userAgent) ? "Mobile" : "Desktop",
-                    access_date: realTodayStr,
+                    browser: getBrowserInfo(),
+                    device_id: getUniqueDeviceId(),
+                    screen: `${window.screen.width}x${window.screen.height}`,
+                    access_date: new Date().toISOString().split('T')[0],
+                    message_date: displayDate.toISOString().split('T')[0],
                     type: "Success",
-                    Person: "Queen"
-                }]);
-            } catch(e) {}
+                    Person: "Queen",
+                    // الأعمدة الإضافية تترك افتراضية أو تُملأ هنا
+                };
+
+                await _supabase.from('access_logs').insert([visitData]);
+            } catch(e) { console.error("Log error:", e); }
         }
 
+        // --- 2. إدارة الرسائل والردود ---
+        let correctPass = "";
+        let displayDate = new Date();
+        const realTodayStr = new Date().toISOString().split('T')[0];
+
+        async function loadDay(dObj) {
+            const dStr = dObj.toISOString().split('T')[0];
+            
+            // جلب رسالة اليوم
+            const { data: msgData } = await _supabase.from('messages').select('*').eq('date', dStr).maybeSingle();
+            if(msgData) {
+                document.getElementById('text-en').innerText = msgData.message;
+                document.getElementById('text-ar').innerText = msgData.translation;
+                if(dStr === realTodayStr) correctPass = String(msgData.password).trim();
+                initCanvas();
+            }
+
+            // جلب الرد (Comment) الخاص بهذا اليوم
+            const { data: commData } = await _supabase.from('comments').select('content').eq('date', dStr).maybeSingle();
+            const rBox = document.getElementById('reply-box');
+            if(commData) {
+                rBox.style.display = 'block';
+                document.getElementById('reply-content').innerText = commData.content;
+            } else {
+                rBox.style.display = 'none';
+            }
+        }
+
+        async function saveReply() {
+            const txt = document.getElementById('reply-input').value.trim();
+            if(!txt) return;
+            const dStr = displayDate.toISOString().split('T')[0];
+            
+            const { error } = await _supabase.from('comments').upsert({ date: dStr, content: txt }, { onConflict: 'date' });
+            
+            if(!error) {
+                document.getElementById('reply-input').value = "";
+                toggleModal();
+                loadDay(displayDate); // تحديث العرض فوراً
+            }
+        }
+
+        function toggleModal() {
+            const m = document.getElementById('modal');
+            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        // --- 3. العدادات والواجهة ---
         function runTimers() {
             const startL = new Date("2025-10-03T16:18:00").getTime();
             const startB = new Date("2026-02-08T00:00:00").getTime();
             const endB = new Date("2026-11-15T00:00:00").getTime();
-
             setInterval(() => {
                 const now = new Date().getTime();
-                
                 const diffL = now - startL;
-                const dL = Math.floor(diffL/86400000);
-                const hL = Math.floor((diffL%86400000)/3600000);
-                const mL = Math.floor((diffL%3600000)/60000);
-                const sL = Math.floor((diffL%60000)/1000);
-                document.getElementById('since-counter').innerHTML = `OUR LOVE: ${dL}D ${hL}H ${mL}M ${sL}S`;
-
+                document.getElementById('since-counter').innerHTML = `OUR LOVE: ${Math.floor(diffL/86400000)}D ${Math.floor((diffL%86400000)/3600000)}H ${Math.floor((diffL%3600000)/60000)}M ${Math.floor((diffL%60000)/1000)}S`;
+                
                 const totalB = endB - startB;
                 const currB = now - startB;
-                let perc = Math.min(Math.max((currB/totalB)*100, 0), 100).toFixed(4);
+                let perc = Math.min(Math.max((currB/totalB)*100, 0), 100).toFixed(2);
                 document.getElementById('perc-fill').style.width = perc + "%";
-                document.getElementById('perc-label').innerText = `${perc}% COMPLETE`;
-
+                document.getElementById('perc-label').innerText = `${perc}% JOURNEY TO LIGHT`;
+                
                 const diffB = endB - now;
                 if(diffB > 0) {
                     document.getElementById('d-val').innerText = Math.floor(diffB/86400000);
@@ -278,41 +305,20 @@
         const canvas = document.getElementById('scratch-canvas');
         const ctx = canvas.getContext('2d');
         let isDrawing = false;
-
         function initCanvas() {
             const box = document.getElementById('scratch-area');
             canvas.width = box.offsetWidth; canvas.height = box.offsetHeight;
             ctx.fillStyle = '#dec9e9'; ctx.fillRect(0,0,canvas.width,canvas.height);
-            ctx.fillStyle = '#5a189a'; ctx.font = "bold 16px Montserrat"; ctx.textAlign = "center";
-            ctx.fillText("Scratch for a Message 💜", canvas.width/2, canvas.height/2 + 5);
-        }
-
-        async function loadDay(dObj) {
-            const dStr = dObj.toISOString().split('T')[0];
-            const { data } = await _supabase.from('messages').select('*').eq('date', dStr).maybeSingle();
-            if(data) {
-                document.getElementById('text-en').innerText = data.message;
-                document.getElementById('text-ar').innerText = data.translation;
-                if(dStr === realTodayStr) correctPass = String(data.password).trim();
-                initCanvas();
-            }
-            const { data: cData } = await _supabase.from('comments').select('content').eq('date', dStr).maybeSingle();
-            const rBox = document.getElementById('reply-box');
-            if(cData) {
-                rBox.style.display = 'block';
-                document.getElementById('reply-content').innerText = cData.content;
-            } else rBox.style.display = 'none';
+            ctx.fillStyle = '#5a189a'; ctx.font = "bold 15px Montserrat"; ctx.textAlign = "center";
+            ctx.fillText("Scratch for your secret 💜", canvas.width/2, canvas.height/2 + 5);
         }
 
         document.getElementById('pass-field').addEventListener('input', function() {
             if(this.value.trim() === correctPass && correctPass !== "") {
                 logVisit();
-                document.getElementById('lock-screen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('lock-screen').style.display = 'none';
-                    document.getElementById('main-content').style.display = 'flex';
-                    runTimers(); initCanvas();
-                }, 1000);
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('main-content').style.display = 'flex';
+                runTimers(); initCanvas();
             }
         });
 
@@ -322,30 +328,14 @@
             const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
             const y = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
             ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath(); ctx.arc(x,y,30,0,Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x,y,25,0,Math.PI*2); ctx.fill();
         }
-
         canvas.addEventListener('mousedown', () => isDrawing = true);
         canvas.addEventListener('touchstart', () => isDrawing = true);
         window.addEventListener('mouseup', () => isDrawing = false);
         window.addEventListener('touchend', () => isDrawing = false);
         canvas.addEventListener('mousemove', scratch);
         canvas.addEventListener('touchmove', (e) => { scratch(e); e.preventDefault(); }, {passive:false});
-
-        function toggleModal() {
-            const m = document.getElementById('modal');
-            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
-        }
-
-        async function saveReply() {
-            const txt = document.getElementById('reply-input').value.trim();
-            if(!txt) return;
-            const dStr = displayDate.toISOString().split('T')[0];
-            await _supabase.from('comments').upsert({ date: dStr, content: txt }, { onConflict: 'date' });
-            document.getElementById('reply-input').value = "";
-            toggleModal();
-            loadDay(displayDate);
-        }
 
         function nav(n) { displayDate.setDate(displayDate.getDate()+n); loadDay(displayDate); }
         function goToday() { displayDate = new Date(); loadDay(displayDate); }
