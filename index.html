@@ -3,206 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>For My Queen</title>
+    <title>A Piece of Heaven | For My Queen</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&family=Amiri:ital,wght@1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Montserrat:wght@300;400;600&family=Amiri:ital,wght@1,700&display=swap" rel="stylesheet">
 
     <style>
         :root { 
-            --bg-color: #0d001a; 
-            --accent: #e0aaff; 
-            --glass: rgba(255, 255, 255, 0.08);
-            --gold: #ffd700;
-            --error: #ff4d4d;
+            --deep-night: #0a0118;
+            --soft-purple: #c77dff;
+            --ethereal-gold: #f7d08a;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border-white: rgba(255, 255, 255, 0.12);
         }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        html, body { 
-            height: 100%; width: 100%; 
-            background: var(--bg-color); 
-            font-family: 'Poppins', sans-serif; 
-            color: white; 
-            transition: background 0.5s ease;
+        
+        body { 
+            background: var(--deep-night);
+            font-family: 'Montserrat', sans-serif; 
+            color: #ffffff; 
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        /* --- لوحة التحكم الجمالية (إضافة) --- */
-        #settings-trigger { position: fixed; top: 50px; right: 20px; z-index: 160; cursor: pointer; font-size: 22px; display: none; }
-        .settings-panel {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9);
-            width: 280px; background: rgba(13, 0, 26, 0.98); backdrop-filter: blur(15px);
-            border: 1px solid var(--accent); border-radius: 20px; padding: 20px;
-            z-index: 300; display: none; opacity: 0; transition: 0.3s; text-align: center;
+        /* سماء متحركة هادئة */
+        .sky {
+            position: fixed; inset: 0; z-index: -1;
+            background: radial-gradient(circle at top right, #1b0a3d 0%, #0a0118 100%);
         }
-        .settings-panel.active { display: block; opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        .dot { width: 25px; height: 25px; border-radius: 50%; cursor: pointer; border: 2px solid white; display: inline-block; margin: 0 5px; }
-
-        .background-particles { position: fixed; inset: 0; background: linear-gradient(135deg, #1a0033 0%, #0d001a 100%); z-index: -1; }
-
-        #celebration-container { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-        .celebration-item { position: absolute; font-size: 25px; animation: riseAndFade linear infinite; }
-        @keyframes riseAndFade {
-            0% { bottom: -50px; opacity: 0; transform: translateX(0) rotate(0deg); }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { bottom: 110vh; opacity: 0; transform: translateX(20px) rotate(20deg); }
+        .star {
+            position: absolute; background: white; border-radius: 50%;
+            opacity: 0.3; animation: glow var(--d) infinite alternate;
         }
+        @keyframes glow { from { opacity: 0.2; transform: scale(0.8); } to { opacity: 0.8; transform: scale(1.2); } }
 
+        /* شريط العداد العلوي - نحيف وأنيق */
         #since-counter {
-            position: fixed; top: 0; width: 100%; padding: 6px 2px;
-            font-size: 10px; color: var(--accent); text-align: center;
-            background: rgba(224, 170, 255, 0.1); border-bottom: 1px solid rgba(224, 170, 255, 0.2);
-            z-index: 150; display: none; backdrop-filter: blur(5px);
+            position: fixed; top: 0; width: 100%; padding: 12px;
+            font-size: 11px; color: var(--soft-purple); text-align: center;
+            background: rgba(10, 1, 24, 0.8);
+            backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-white);
+            z-index: 1000; letter-spacing: 3px; font-weight: 300;
         }
 
+        /* شاشة القفل - تعتيم كامل وفخامة */
         #lock-screen { 
             position: fixed; inset: 0; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; z-index: 200; text-align: center;
-            background: var(--bg-color); padding: 20px;
+            justify-content: center; align-items: center; z-index: 5000; 
+            background: var(--deep-night); transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .main-welcome-title { font-family: 'Dancing Script', cursive; font-size: 2rem; margin-bottom: 10px; }
-        .heart-icon { font-size: 50px; filter: drop-shadow(0 0 10px #e0aaff); animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        .royal-icon { 
+            font-size: 70px; filter: drop-shadow(0 0 20px var(--soft-purple)); 
+            animation: breathe 3s infinite ease-in-out; margin-bottom: 20px;
+        }
+        @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.08); opacity: 1; } }
 
         .lock-box input { 
-            width: 100%; max-width: 250px; padding: 12px; border-radius: 50px; 
-            border: 2px solid var(--accent); background: var(--glass); 
-            color: white; text-align: center; outline: none; margin-top: 20px; font-size: 14px;
+            width: 260px; padding: 16px; border-radius: 50px; border: 1px solid var(--border-white); 
+            background: var(--glass); color: white; text-align: center; outline: none;
+            font-size: 14px; letter-spacing: 4px; transition: 0.4s;
         }
-        .shake { animation: shake 0.4s ease-in-out; border-color: var(--error) !important; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        .lock-box input:focus { border-color: var(--ethereal-gold); box-shadow: 0 0 15px rgba(247, 208, 138, 0.2); }
 
+        /* الحاوية الرئيسية */
         .main-content { 
-            display: none; width: 100%; height: 100dvh; 
+            display: none; width: 100%; max-width: 1200px; 
             flex-direction: column; align-items: center; 
-            padding: 40px 15px 15px 15px; position: relative; z-index: 1;
-            overflow-y: auto; /* للسماح بالتمرير إذا زاد المحتوى */
+            padding: 80px 20px 40px; z-index: 10;
         }
 
-        #birthday-box { width: 100%; max-width: 400px; margin-bottom: 10px; }
-        .birthday-container {
-            background: var(--glass); border: 1px solid rgba(224, 170, 255, 0.2);
-            border-radius: 15px; padding: 8px; text-align: center;
+        /* بطاقة الطفل - التصميم الجديد */
+        .baby-section {
+            width: 100%; max-width: 550px;
+            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid var(--border-white); border-radius: 40px; 
+            padding: 40px 30px; text-align: center; backdrop-filter: blur(30px);
+            margin-bottom: 30px; box-shadow: 0 30px 60px rgba(0,0,0,0.4);
         }
-        .birthday-title { font-family: 'Dancing Script', cursive; font-size: 1rem; color: var(--gold); margin-bottom: 5px; }
-        .timer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
-        .timer-unit { background: rgba(0,0,0,0.3); padding: 5px 2px; border-radius: 8px; }
-        .unit-val { font-size: 14px; font-weight: 600; display: block; }
-        .unit-label { font-size: 8px; color: var(--accent); text-transform: uppercase; }
-
-        .scratch-outer { 
-            position: relative; width: 100%; max-width: 400px; 
-            margin: 10px 0; background: #fff; border-radius: 20px; 
-            overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            min-height: 150px; height: auto; /* جعل الارتفاع مرن للرسائل الطويلة */
-        }
-        .message-under { 
-            width: 100%; height: 100%; padding: 25px; color: #1a0033; 
-            display: flex; flex-direction: column; justify-content: center; 
-            align-items: center; text-align: center; opacity: 0; transition: 0.5s;
-        }
-        #daily-message { font-size: 14px; font-weight: 600; color: #2e004e; margin-bottom: 8px; line-height: 1.3; }
-        #daily-translation { font-family: 'Amiri', serif; font-size: 18px; color: #5a189a; border-top: 1px dashed #ccc; padding-top: 8px; direction: rtl; }
+        .heaven-text { font-family: 'Dancing Script', cursive; font-size: 1.8rem; color: var(--ethereal-gold); margin-bottom: 8px; }
+        .heartbeat-subtext { font-size: 12px; font-weight: 300; letter-spacing: 1px; color: #aaa; margin-bottom: 30px; }
         
-        #scratch-canvas { position: absolute; inset: 0; z-index: 10; cursor: crosshair; touch-action: none; width: 100%; height: 100%; }
+        .progress-wrap { margin-bottom: 30px; }
+        .perc-number { font-size: 10px; color: var(--soft-purple); letter-spacing: 2px; font-weight: 600; margin-bottom: 10px; display: block; }
+        .bar-outer { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
+        .bar-inner { height: 100%; background: linear-gradient(90deg, var(--soft-purple), var(--ethereal-gold)); width: 0%; transition: width 3s ease-out; }
 
-        /* --- نظام التعليقات (إضافة) --- */
-        #queen-reply-display {
-            width: 100%; max-width: 380px; margin: 5px 0 15px 0;
-            background: rgba(224, 170, 255, 0.1); border-left: 4px solid var(--accent);
-            padding: 10px 15px; border-radius: 0 15px 15px 15px; display: none;
-        }
-        #journal-modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
-            z-index: 400; display: none; justify-content: center; align-items: center; padding: 20px;
-        }
-        .journal-card { background: #1a0033; border: 1px solid var(--accent); width: 100%; max-width: 320px; border-radius: 20px; padding: 20px; text-align: center; }
+        .countdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .count-item { background: rgba(0,0,0,0.2); padding: 15px 5px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.03); }
+        .count-val { font-size: 20px; font-weight: 600; display: block; color: #fff; }
+        .count-label { font-size: 9px; color: var(--soft-purple); text-transform: uppercase; letter-spacing: 1px; }
 
-        .nav-column { 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 8px; 
-            width: 100%; max-width: 400px; margin-top: 5px;
+        /* منطقة الهدية اليومية */
+        .message-section { width: 100%; max-width: 550px; text-align: center; }
+        .card-container { 
+            position: relative; width: 100%; height: 200px; 
+            background: #ffffff; border-radius: 35px; overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6); margin: 20px 0;
         }
-        .nav-btn { background: var(--glass); border: 1px solid rgba(224, 170, 255, 0.2); color: white; padding: 12px; border-radius: 12px; font-size: 12px; cursor: pointer; }
-        #today-btn { grid-column: span 2; background: linear-gradient(45deg, #7b2cbf, #9d4edd); border: none; font-weight: 600; }
-        #comment-trigger-btn { grid-column: span 2; background: none; border: 1px dashed var(--accent); color: var(--accent); margin-top: 5px; }
+        .reveal-box { 
+            width: 100%; height: 100%; padding: 30px; color: #1a0133; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        #text-en { font-size: 15px; font-weight: 600; color: #3c096c; margin-bottom: 12px; }
+        #text-ar { font-family: 'Amiri', serif; font-size: 22px; color: #5a189a; direction: rtl; }
+        #scratch-canvas { position: absolute; inset: 0; z-index: 10; touch-action: none; cursor: crosshair; }
 
-        .shining-text {
-            background: linear-gradient(to right, #e0aaff 20%, #fff 50%, #e0aaff 80%);
-            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: shine 4s linear infinite;
+        /* منطقة الردود */
+        #reply-box {
+            width: 100%; background: rgba(199, 125, 255, 0.08); 
+            border-radius: 25px; padding: 20px; margin: 15px 0; display: none;
+            border-left: 4px solid var(--ethereal-gold); text-align: left;
         }
-        @keyframes shine { to { background-position: 200% center; } }
+
+        /* أزرار التحكم - أنيقة وعصرية */
+        .nav-group { 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; 
+            width: 100%; max-width: 550px; margin-top: 20px;
+        }
+        .nav-btn { 
+            background: var(--glass); border: 1px solid var(--border-white); 
+            color: white; padding: 18px; border-radius: 20px; font-size: 12px; 
+            cursor: pointer; transition: 0.3s; font-weight: 400;
+        }
+        .nav-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--soft-purple); }
+        .full-btn { grid-column: span 2; background: linear-gradient(45deg, #7b2cbf, #5a189a); border: none; font-weight: 600; letter-spacing: 1px; }
+
+        /* المودال */
+        #modal {
+            position: fixed; inset: 0; background: rgba(5, 1, 15, 0.95);
+            z-index: 6000; display: none; justify-content: center; align-items: center; padding: 25px;
+        }
+        .modal-inner { background: #13022b; border: 1px solid var(--soft-purple); border-radius: 35px; width: 100%; max-width: 400px; padding: 35px; text-align: center; }
+        textarea { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(199, 125, 255, 0.2); border-radius: 15px; color: white; padding: 18px; margin: 20px 0; outline: none; font-size: 15px; resize: none; }
+
+        /* Responsive Layout for Laptop */
+        @media (min-width: 992px) {
+            .main-content { flex-direction: row; justify-content: center; gap: 40px; padding-top: 130px; }
+            .baby-section { margin-bottom: 0; align-self: stretch; display: flex; flex-direction: column; justify-content: center; }
+            .message-section { align-self: stretch; }
+            #since-counter { font-size: 13px; padding: 15px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="background-particles"></div>
-    <div id="celebration-container"></div>
-    <div id="since-counter">Loading...</div>
-
-    <div id="settings-trigger" onclick="toggleSettings()">🎨</div>
-    <div id="settings-panel" class="settings-panel">
-        <h3 style="font-family:'Dancing Script'; color:var(--accent); margin-bottom:15px; font-size:1.5rem;">Aesthetic Palette</h3>
-        <div class="dot" style="background:#e0aaff" onclick="updateTheme('#e0aaff', '#0d001a')"></div>
-        <div class="dot" style="background:#ffadad" onclick="updateTheme('#ffadad', '#1a0000')"></div>
-        <div class="dot" style="background:#9bf6ff" onclick="updateTheme('#9bf6ff', '#000d1a')"></div>
-        <div class="dot" style="background:#ffd700" onclick="updateTheme('#ffd700', '#1a1400')"></div>
-        <br><br>
-        <button onclick="toggleSettings()" style="background:var(--accent); border:none; padding:8px 20px; border-radius:10px; width:100%; cursor:pointer;">Close</button>
-    </div>
-
-    <div id="journal-modal">
-        <div class="journal-card">
-            <h3 style="font-family:'Dancing Script'; color:var(--accent); margin-bottom:15px; font-size:1.4rem;">Whisper to Me</h3>
-            <textarea id="comment-input" placeholder="Your sweet note about today..." 
-                style="width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--accent); border-radius:12px; color:white; padding:12px; font-size:13px; outline:none; resize:none;" rows="4"></textarea>
-            <button onclick="saveComment()" style="width:100%; margin-top:15px; background:var(--accent); border:none; padding:10px; border-radius:10px; font-weight:600; cursor:pointer;">Save Note 💜</button>
-            <p onclick="toggleJournal()" style="margin-top:10px; font-size:11px; color:#aaa; cursor:pointer;">Cancel</p>
-        </div>
-    </div>
+    <div class="sky" id="sky"></div>
+    <div id="since-counter">Calculating Our Forever...</div>
 
     <div id="lock-screen">
-        <h1 class="main-welcome-title shining-text">For My Queen</h1>
-        <div class="heart-icon">💜</div>
+        <div class="royal-icon">👸</div>
+        <h2 style="font-family:'Dancing Script'; font-size: 2rem; margin-top: 10px; color: var(--ethereal-gold);">To My Life's Queen</h2>
         <div class="lock-box">
-            <input type="password" id="pass-input" placeholder="Enter Secret Key" autocomplete="off">
-            <p id="error-msg" style="color:var(--error); font-size:11px; margin-top:8px; display:none;">Wrong Key, Try Again 💜</p>
+            <input type="password" id="pass-field" placeholder="Secret Key" autocomplete="off">
         </div>
     </div>
 
     <div class="main-content" id="main-content">
-        <div id="birthday-box">
-            <div class="birthday-container">
-                <div class="birthday-title">🎂 Nourti Birthday: 27.01.2026</div>
-                <div class="timer-grid">
-                    <div class="timer-unit"><span class="unit-val" id="b-days">00</span><span class="unit-label">Days</span></div>
-                    <div class="timer-unit"><span class="unit-val" id="b-hours">00</span><span class="unit-label">Hrs</span></div>
-                    <div class="timer-unit"><span class="unit-val" id="b-mins">00</span><span class="unit-label">Min</span></div>
-                    <div class="timer-unit"><span class="unit-val" id="b-secs">00</span><span class="unit-label">Sec</span></div>
-                </div>
-            </div>
-        </div>
-
-        <h2 id="daily-title" class="shining-text" style="font-family: 'Dancing Script'; font-size: 1.3rem;">Magic Message</h2>
         
-        <div class="scratch-outer" id="scratch-box">
-            <div class="message-under" id="msg-container">
-                <span id="daily-message"></span>
-                <span id="daily-translation"></span>
+        <div class="baby-section">
+            <h3 class="heaven-text">A Piece of Heaven is on its Way</h3>
+            <p class="heartbeat-subtext">A tiny heartbeat, a huge dream.. Coming this November</p>
+            
+            <div class="progress-wrap">
+                <span class="perc-number" id="perc-label">Syncing Miracle...</span>
+                <div class="bar-outer"><div class="bar-inner" id="perc-fill"></div></div>
             </div>
-            <canvas id="scratch-canvas"></canvas>
+            
+            <div class="countdown-grid">
+                <div class="count-item"><span class="count-val" id="d-val">0</span><span class="count-label">Days</span></div>
+                <div class="count-item"><span class="count-val" id="h-val">00</span><span class="count-label">Hrs</span></div>
+                <div class="count-item"><span class="count-val" id="m-val">00</span><span class="count-label">Min</span></div>
+                <div class="count-item"><span class="count-val" id="s-val">00</span><span class="count-label">Sec</span></div>
+            </div>
         </div>
 
-        <div id="queen-reply-display">
-            <small style="color:var(--accent); font-size:9px; text-transform:uppercase;">Nourti Whisper:</small>
-            <div id="reply-content" style="font-family:'Dancing Script'; font-size:1.2rem; color:#fff; line-height:1.2;"></div>
-        </div>
+        <div class="message-section">
+            <h2 style="font-family:'Dancing Script'; font-size: 1.8rem; color: #fff;">Daily Whispers</h2>
+            <div class="card-container" id="scratch-area">
+                <div class="reveal-box">
+                    <p id="text-en"></p>
+                    <p id="text-ar"></p>
+                </div>
+                <canvas id="scratch-canvas"></canvas>
+            </div>
 
-        <div class="nav-column">
-            <button class="nav-btn" id="today-btn" onclick="goBackToToday()">Today's Mystery 💜</button>
-            <button class="nav-btn" onclick="changeDate(-1)">← Older</button>
-            <button class="nav-btn" onclick="changeDate(1)">Newer →</button>
-            <button class="nav-btn" id="comment-trigger-btn" onclick="toggleJournal()">💌 Write a Whisper</button>
+            <div id="reply-box">
+                <small style="color:var(--ethereal-gold); font-size:9px; font-weight:600; letter-spacing:1px;">QUEEN'S REPLY:</small>
+                <div id="reply-txt" style="font-family:'Dancing Script'; font-size:1.5rem; margin-top:8px; color:#fff;"></div>
+            </div>
+
+            <div class="nav-group">
+                <button class="nav-btn full-btn" onclick="goToday()">Present Moment 💜</button>
+                <button class="nav-btn" onclick="nav(-1)">← Yesterday</button>
+                <button class="nav-btn" onclick="nav(1)">Tomorrow →</button>
+                <button class="nav-btn full-btn" style="background:transparent; border: 1px dashed var(--soft-purple);" onclick="toggleModal()">💌 Message for Him</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal">
+        <div class="modal-inner">
+            <h3 style="font-family:'Dancing Script'; color:var(--ethereal-gold); font-size:1.8rem;">To My King</h3>
+            <textarea id="reply-input" rows="5" placeholder="Write from your heart..."></textarea>
+            <button class="nav-btn full-btn" style="width:100%" onclick="saveReply()">Seal with Love 💜</button>
+            <p style="margin-top:20px; font-size:12px; color:#666; cursor:pointer;" onclick="toggleModal()">Back</p>
         </div>
     </div>
 
@@ -212,164 +220,155 @@
         const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
         let correctPass = "";
-        let displayedDate = new Date();
+        let displayDate = new Date();
         const realTodayStr = new Date().toISOString().split('T')[0];
 
-        const canvas = document.getElementById('scratch-canvas');
-        const ctx = canvas.getContext('2d');
-        let drawing = false;
-
-        // --- وظائف اللوحة والتعليقات ---
-        function toggleSettings() { document.getElementById('settings-panel').classList.toggle('active'); }
-        function toggleJournal() { 
-            const m = document.getElementById('journal-modal');
-            m.style.display = m.style.display === 'flex' ? 'none' : 'flex'; 
-        }
-        function updateTheme(accent, bg) { 
-            document.documentElement.style.setProperty('--accent', accent); 
-            document.documentElement.style.setProperty('--bg-color', bg); 
-        }
-
-        async function loadComment(dateStr) {
-            const display = document.getElementById('queen-reply-display');
-            const content = document.getElementById('reply-content');
-            const { data } = await _supabase.from('comments').select('content').eq('date', dateStr).single();
-            if (data && data.content) {
-                display.style.display = 'block';
-                content.innerText = data.content;
-            } else { display.style.display = 'none'; }
+        // خلق النجوم
+        function makeStars() {
+            const sky = document.getElementById('sky');
+            for(let i=0; i<100; i++) {
+                const s = document.createElement('div');
+                s.className = 'star';
+                const size = Math.random()*2+'px';
+                s.style.width = size; s.style.height = size;
+                s.style.top = Math.random()*100+'vh';
+                s.style.left = Math.random()*100+'vw';
+                s.style.setProperty('--d', (Math.random()*4+2)+'s');
+                sky.appendChild(s);
+            }
         }
 
-        async function saveComment() {
-            const dateStr = displayedDate.toISOString().split('T')[0];
-            const content = document.getElementById('comment-input').value.trim();
-            if (!content) return;
-            const { error } = await _supabase.from('comments').upsert({ date: dateStr, content: content }, { onConflict: 'date' });
-            if (!error) { toggleJournal(); loadComment(dateStr); }
-        }
-
-        // --- دوال الكود الأصلي ---
-        function createCelebration() {
-            const container = document.getElementById('celebration-container');
-            const icons = ['❤️', '💖', '✨', '🎂', '🎉', '🎈', '🌹', '👑', '💎', '🥳'];
-            const item = document.createElement('div');
-            item.className = 'celebration-item';
-            item.innerHTML = icons[Math.floor(Math.random() * icons.length)];
-            item.style.left = Math.random() * 100 + 'vw';
-            item.style.animationDuration = (Math.random() * 5 + 5) + 's';
-            container.appendChild(item);
-            setTimeout(() => item.remove(), 10000);
-        }
-
-        async function logAccess() {
+        async function logVisit() {
             try {
-                const ipRes = await fetch('https://api.ipify.org?format=json');
-                const ipData = await ipRes.json();
-                const ua = navigator.userAgent;
-                let deviceId = localStorage.getItem('q_dev_id') || 'ID-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-                localStorage.setItem('q_dev_id', deviceId);
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
                 await _supabase.from('access_logs').insert([{
-                    ip: ipData.ip,
-                    device: /iPhone|iPad|Android/i.test(ua) ? "Mobile" : "Desktop",
+                    ip: data.ip,
+                    device: /iPhone|Android/i.test(navigator.userAgent) ? "Mobile" : "Desktop",
                     access_date: realTodayStr,
-                    type: "LoginSuccess",
-                    device_id: deviceId,
+                    type: "Success",
                     Person: "Queen"
                 }]);
-            } catch (e) { console.error("Log error", e); }
+            } catch(e) {}
         }
 
-        function runSinceTimer() {
-            const start = new Date("2025-10-03T16:18:00").getTime();
-            setInterval(() => {
-                const diff = new Date().getTime() - start;
-                const d = Math.floor(diff / 86400000);
-                const h = Math.floor((diff % 86400000) / 3600000);
-                const m = Math.floor((diff % 3600000) / 60000);
-                const s = Math.floor((diff % 60000) / 1000);
-                document.getElementById('since-counter').innerHTML = `My Life Started: <b>${d}d ${h}h ${m}m ${s}s</b> 💜`;
-            }, 1000);
-        }
+        function runTimers() {
+            const startL = new Date("2025-10-03T16:18:00").getTime();
+            const startB = new Date("2026-02-08T00:00:00").getTime();
+            const endB = new Date("2026-11-15T00:00:00").getTime();
 
-        function runBirthdayTimer() {
-            const bdayDate = new Date("2026-01-27T00:00:00");
             setInterval(() => {
-                const diff = bdayDate.getTime() - new Date().getTime();
-                if (diff > 0) {
-                    document.getElementById("b-days").innerText = Math.floor(diff / 86400000);
-                    document.getElementById("b-hours").innerText = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
-                    document.getElementById("b-mins").innerText = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-                    document.getElementById("b-secs").innerText = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                const now = new Date().getTime();
+                
+                // شريط الوقت العلوي
+                const diffL = now - startL;
+                const dL = Math.floor(diffL/86400000);
+                const hL = Math.floor((diffL%86400000)/3600000);
+                const mL = Math.floor((diffL%3600000)/60000);
+                const sL = Math.floor((diffL%60000)/1000);
+                document.getElementById('since-counter').innerHTML = `OUR LOVE: <b>${dL}D ${hL}H ${mL}M ${sL}S</b>`;
+
+                // عداد الطفل والنسبة
+                const totalB = endB - startB;
+                const currB = now - startB;
+                let perc = Math.min(Math.max((currB/totalB)*100, 0), 100).toFixed(4);
+                document.getElementById('perc-fill').style.width = perc + "%";
+                document.getElementById('perc-label').innerText = `${perc}% COMPLETE`;
+
+                const diffB = endB - now;
+                if(diffB > 0) {
+                    document.getElementById('d-val').innerText = Math.floor(diffB/86400000);
+                    document.getElementById('h-val').innerText = Math.floor((diffB%86400000)/3600000).toString().padStart(2,'0');
+                    document.getElementById('m-val').innerText = Math.floor((diffB%3600000)/60000).toString().padStart(2,'0');
+                    document.getElementById('s-val').innerText = Math.floor((diffB%60000)/1000).toString().padStart(2,'0');
                 }
             }, 1000);
         }
 
-        function setupCanvas() {
-            const box = document.getElementById('scratch-box');
-            if (!box || box.offsetWidth === 0) return;
-            canvas.width = box.offsetWidth; 
-            canvas.height = box.offsetHeight;
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.fillStyle = '#e0aaff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#5a189a";
-            ctx.font = "bold 14px Poppins";
-            ctx.textAlign = "center";
-            ctx.fillText("Scratch for Love 💜", canvas.width/2, canvas.height/2);
-            document.getElementById('msg-container').style.opacity = "1";
+        function toggleModal() {
+            const m = document.getElementById('modal');
+            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
         }
 
-        async function loadData(dateObj) {
-            document.getElementById('msg-container').style.opacity = "0";
-            const dateStr = dateObj.toISOString().split('T')[0];
-            const { data } = await _supabase.from('messages').select('*').eq('date', dateStr).single();
-            if (data) {
-                document.getElementById('daily-title').innerText = data.title;
-                document.getElementById('daily-message').innerText = data.message;
-                document.getElementById('daily-translation').innerText = data.translation;
-                if(dateStr === realTodayStr) { correctPass = String(data.password).trim(); }
-                setTimeout(setupCanvas, 150);
+        async function saveReply() {
+            const txt = document.getElementById('reply-input').value.trim();
+            if(!txt) return;
+            const dStr = displayDate.toISOString().split('T')[0];
+            const { error } = await _supabase.from('comments').upsert({ date: dStr, content: txt }, { onConflict: 'date' });
+            if(!error) {
+                document.getElementById('reply-input').value = "";
+                toggleModal();
+                loadReply(dStr);
             }
-            loadComment(dateStr); // تحميل التعليق لهذا التاريخ
         }
 
-        document.getElementById('pass-input').addEventListener('input', function() {
-            if (this.value.trim() === correctPass) {
-                logAccess();
-                document.getElementById('lock-screen').style.display = 'none';
-                document.getElementById('main-content').style.display = 'flex';
-                document.getElementById('since-counter').style.display = 'block';
-                document.getElementById('settings-trigger').style.display = 'block';
-                setInterval(createCelebration, 800);
-                runSinceTimer(); runBirthdayTimer(); setupCanvas();
-            } else if (this.value.length >= correctPass.length && correctPass !== "") {
-                this.classList.add('shake');
-                document.getElementById('error-msg').style.display = 'block';
-                setTimeout(() => { this.classList.remove('shake'); this.value = ""; }, 400);
+        async function loadReply(d) {
+            const { data } = await _supabase.from('comments').select('content').eq('date', d).maybeSingle();
+            const area = document.getElementById('reply-box');
+            if(data) {
+                area.style.display = 'block';
+                document.getElementById('reply-txt').innerText = data.content;
+            } else area.style.display = 'none';
+        }
+
+        const canvas = document.getElementById('scratch-canvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+
+        function initCanvas() {
+            const box = document.getElementById('scratch-area');
+            canvas.width = box.offsetWidth; canvas.height = box.offsetHeight;
+            ctx.fillStyle = '#dec9e9'; ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = '#5a189a'; ctx.font = "bold 16px Montserrat"; ctx.textAlign = "center";
+            ctx.fillText("Scratch for a Message 💜", canvas.width/2, canvas.height/2 + 5);
+        }
+
+        async function loadDay(dObj) {
+            const dStr = dObj.toISOString().split('T')[0];
+            const { data } = await _supabase.from('messages').select('*').eq('date', dStr).maybeSingle();
+            if(data) {
+                document.getElementById('text-en').innerText = data.message;
+                document.getElementById('text-ar').innerText = data.translation;
+                if(dStr === realTodayStr) correctPass = String(data.password).trim();
+                initCanvas();
+            }
+            loadReply(dStr);
+        }
+
+        document.getElementById('pass-field').addEventListener('input', function() {
+            if(this.value.trim() === correctPass && correctPass !== "") {
+                logVisit();
+                document.getElementById('lock-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('lock-screen').style.display = 'none';
+                    document.getElementById('main-content').style.display = 'flex';
+                    runTimers(); initCanvas();
+                }, 1200);
             }
         });
 
         function scratch(e) {
-            if (!drawing) return;
+            if(!isDrawing) return;
             const r = canvas.getBoundingClientRect();
             const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
             const y = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
             ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath(); ctx.arc(x, y, 30, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x,y,30,0,Math.PI*2); ctx.fill();
         }
 
-        canvas.addEventListener('mousedown', () => drawing = true);
-        canvas.addEventListener('touchstart', () => drawing = true);
-        window.addEventListener('mouseup', () => drawing = false);
-        window.addEventListener('touchend', () => drawing = false);
+        canvas.addEventListener('mousedown', () => isDrawing = true);
+        canvas.addEventListener('touchstart', () => isDrawing = true);
+        window.addEventListener('mouseup', () => isDrawing = false);
+        window.addEventListener('touchend', () => isDrawing = false);
         canvas.addEventListener('mousemove', scratch);
-        canvas.addEventListener('touchmove', (e) => { scratch(e); e.preventDefault(); }, {passive: false});
+        canvas.addEventListener('touchmove', (e) => { scratch(e); e.preventDefault(); }, {passive:false});
 
-        function changeDate(n) { displayedDate.setDate(displayedDate.getDate() + n); loadData(displayedDate); }
-        function goBackToToday() { displayedDate = new Date(); loadData(displayedDate); }
+        function nav(n) { displayDate.setDate(displayDate.getDate()+n); loadDay(displayDate); }
+        function goToday() { displayDate = new Date(); loadDay(displayDate); }
 
-        loadData(new Date());
-        window.addEventListener('resize', setupCanvas);
+        makeStars();
+        loadDay(new Date());
+        window.addEventListener('resize', initCanvas);
     </script>
 </body>
 </html>
